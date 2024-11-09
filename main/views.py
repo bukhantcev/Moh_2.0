@@ -67,12 +67,12 @@ def index(request):       #-------------MAIN
                             record_l.save()
                     for new_event in create_event(url):
                         control_str = ''
-                        str_from_request = f'{new_event['date']}{new_event['name']}Спектакль'
+                        str_from_request = f'{new_event["date"]}{new_event["name"]}Спектакль'
                         location = new_event['location'].strip()
                         control_index = 0
                         for i in old_events:
                             control_str = f'{i.date}{i.name}{i.type}'
-                            str_from_request = f'{new_event['date']}{new_event['name']}Спектакль'
+                            str_from_request = f'{new_event["date"]}{new_event["name"]}Спектакль'
                             if control_str == str_from_request:
                                 control_index = 1
 
