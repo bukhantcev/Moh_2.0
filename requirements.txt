@@ -7,6 +7,6 @@ crispy-bootstrap4
 django-colorfield
 django-admin-interface
 beautifulsoup4
-ssl
+
 yadisk
 wget
