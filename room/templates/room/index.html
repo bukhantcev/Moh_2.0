@@ -1,0 +1,17 @@
+{% extends 'main/layout.html' %}
+
+{% block title %} Личный кабинет {% endblock %}
+
+
+
+
+
+{% block main %}
+<div class="container-fluid h-100 d-flex justify-content-center" style="margin-top: 15rem;">
+    <div class="row">
+        <div class="col">
+            <h3 style="text-align: center;">{{ request.user }}, добро пожаловать в личный кабинет!</h3>
+        </div>
+    </div>
+</div>
+{% endblock %}

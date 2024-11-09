@@ -1,0 +1,67 @@
+{% extends 'main/layout.html' %}
+
+{% block title %} Личный кабинет {% endblock %}
+
+
+
+
+
+{% block main %}
+<div class="row" style="margin-top: 50px;">
+    <div class="col d-flex justify-content-center">
+        <h1>
+            Спектакли
+        </h1>
+    </div>
+</div>
+<div class="container-fluid h-100 d-flex justify-content-center" style="margin-top: 5rem;">
+ 
+    <div class="row">
+        <div class="col">
+            
+            {% for spect in spects %}
+            <a href="edit_spect?id={{ spect.id }}"><button class="btn btn-custom justify-content-center" style="width: 15rem; margin-bottom: 1rem;">{{ spect.name }}</button></a>
+            {% if request.user.is_staff %}
+            <button class="btn btn-custom btn-custom-delete" style="margin-bottom: 1rem;" type="button" data-bs-toggle="modal" data-bs-target="#ModalDelete-{{spect.id}}">X</button><br>
+            {% endif %}
+              <!-- Modal -->
+  <div class="modal fade" id="ModalDelete-{{spect.id}}" tabindex="-1" aria-labelledby="ModalDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Внимание!!!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Вы хотите удалить спектакль "{{ spect.name }}" и все материалы???</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" style="margin-top: 15px; margin-bottom: 0px;" data-bs-dismiss="modal">Отмена</button>
+          <form action="" method="post">
+            {% csrf_token %}
+          <button type="submit" name="deleteSpect" value="{{spect.id}}" style="background-color: red;" class="btn btn-primary">Удалить</button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+            {% endfor %}
+            <br><br>
+            {% if request.user.is_staff %}
+            <a href="add_spect"><button class="btn btn-primary">Добавить спектакль</button></a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- Button trigger modal -->
+
+  
+
+  
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block main %}
+
+
+
+<form method="POST" novalidate>
+              {% csrf_token %}
+
+
+
+              <label for="id_phone">Введите номер телефона</label>
+              <input type="tel" name="phone" id="id_phone" class="form-control">
+              <label for="id_dolgnost">Выберите подразделение</label>
+              <input type="text" name="dolgnost" id="id_dolgnost" class="form-control">
+
+              <button class="btn btn-success" type="submit">Отправить</button>
+
+
+</form>>
+
+{% endblock %}

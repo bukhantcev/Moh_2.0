@@ -1,0 +1,43 @@
+{% extends 'main/layout.html' %}
+
+{% block title %} Личный кабинет {% endblock %}
+
+
+
+
+
+{% block main %}
+<div class="row">
+    <div class="col d-flex justify-content-center" style="margin-top: 150px;">
+        <h1>Добавить спектакль</h1>
+    </div>
+</div>
+<div class="container-fluid h-100 d-flex justify-content-center" style="margin-top: 2rem;">
+    <div class="row">
+        <div class="col">
+            <form accept="" method="post" id="myForm", enctype="multipart/form-data">
+              {% csrf_token %}
+            {% for field in form %}
+            {% if field.errors %}
+              <ul class="errorlist">
+                {% for error in field.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            <div class="row">
+                <div class="col d-flex justify-content-start">
+                    {{ field.label }}
+                </div>
+                <div class="col d-flex justify-content-end">
+                    {{ field }}
+                </div>
+            </div>
+
+            {% endfor %}
+            <button type="submit">Save</button>
+        </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

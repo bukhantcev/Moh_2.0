@@ -1,0 +1,42 @@
+{% extends  'base.html' %}
+{% load crispy_forms_tags %}
+{% load bootstrap5 %}
+
+
+{% block main %}
+
+<header style="box-shadow: 2px 2px 2px 1px rgba(0,0,0, .2);">
+    <div class="container-fluid d-flex p-10" style="flex-direction: column;">
+      <div class="row">
+        <div class="col align-items-left">
+          <img src="../../static/main/img/logoMH.png" style="width: 5rem; height: 5rem;" alt="">
+        </div>
+        <div class="col" style="align-content: center; float: right;">
+          <a href="{% url 'register' %}"><h4 style="text-align: right;">Регистрация</h4></a>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main style="margin-top: 10rem;">
+    <div class="container-fluid d-flex justify-content-center">
+      <div class="row">
+        <div class="col">          
+
+
+
+<div class="card">
+<div class="card-body">
+
+<form method="post">
+{% csrf_token %}
+<h1>Вход</h1>
+    <form action="." method="post">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button class="btn btn-success" type="submit">Войти</button>
+    </form>
+
+</form>
+</div>
+</div>
+{% endblock %}

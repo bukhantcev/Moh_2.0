@@ -1,0 +1,59 @@
+{% extends 'main/layout.html' %}
+
+{% block title %} Личный кабинет {% endblock %}
+
+
+
+
+
+{% block main %}
+<div class="row">
+    <div class="col d-flex justify-content-center" style="margin-top: 150px;">
+        <a href="edit_spect?id={{spect.id}}"><h1><button class="btn btn-custom">{{ spect.name }}</button></h1></a>
+        
+    </div>
+
+       
+
+</div>
+<div class="row">
+    <div class="col d-flex justify-content-center">
+
+            <h3>{% if folder == 'svet_doc' %}Свет{% elif folder == 'zvuk_doc' %}Звук{% elif folder == 'video_doc' %}Видео{% elif folder == 'decor_doc' %}Декорация{% elif folder == 'rekv_doc' %}Реквизит{% elif folder == 'grim_doc' %}Грим{% elif folder == 'kostum_doc' %}Костюм{% endif %}</h3>
+
+        
+    </div>
+
+       
+
+</div>
+<div class="container-fluid h-100 d-flex justify-content-center" style="margin-top: 2rem;">
+    <div class="row">
+        <div class="col justify-content-center">
+            {% for file in files %}
+            
+            <a href="open_pdf?path=materials/{{spect.name}}/{{folder}}/{{file}}&id={{spect.id}}"><button class="btn btn-custom">{{ file }}</button></a>{% if request.user.is_staff %}<a style="margin-left: 0.5rem; color: red;" href="folder?folder={{folder}}&id={{ spect.id }}&status=delete&path=materials/{{spect.name}}/{{folder}}/{{file}}"><button class="btn btn-custom btn-custom-delete">X</button></a>{% endif %}<br>
+            {% endfor %}
+            
+            {% if request.user.is_staff %} <button class="btn btn-primary" onclick="addFile(this)" type="button">Добавить файл</button> {% endif %}
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input id="addFile" name="upload_files" type="file" multiple style="display: none;"><br>
+                <button class="btn btn-primary" name="addFile" value="{{ spect.id }}${{ folder }}" id="savebtn" style="display: none;" type="submit">Сохранить</button>
+            </form>
+        <a href="/edit_spect?id={{spect.id}}"><button class="btn btn-primary">Назад</button></a>
+        </div>
+    </div>
+</div>
+ 
+<script>
+    function addFile(me){
+        document.getElementById('addFile').setAttribute('style', '');
+        me.setAttribute('style', 'display: none');
+        document.getElementById('savebtn').setAttribute('style', '');
+    }
+</script>
+
+
+
+{% endblock %}

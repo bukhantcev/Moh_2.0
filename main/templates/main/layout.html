@@ -1,0 +1,111 @@
+{% load bootstrap5 %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Мохнатый Шмель</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="../../static/main/css/bootstrap5.css">
+  <link rel="stylesheet" href="../../static/main/css/scss.scss">
+  <link rel="stylesheet" href="../../static/main/css/main.css">
+  <link rel="stylesheet" href="../../static/main/font/Roboto/Roboto-Italic.ttf">
+
+<body class="p-1">
+
+  <div class="wrapper">
+    <header>
+      <div class="container-fluid fixed-top">
+        <div class="row">
+          <div class="col-2"><!--logo-->
+            <div class="logo-test"><a href="{% url 'home' %}?home=home" type="submit"><img
+                  src="../../static/main/img/logoMH.png" alt=""></a></div>
+          </div><!--logo-->
+          {% url 'home' as home %}
+          {% url 'room' as room %}
+          {% if request.path == home or request.path == room %}
+          <div class="col-8 d-none d-lg-block"><!--navbar-->
+            {% include "main/offcanvas.html" %}
+          </div><!--navbar-->
+          
+          <div class="col-2 d-none d-lg-block">
+            {% include "main/user-info.html" %}
+          </div>
+          
+
+
+          <div class="col d-flex d-lg-none justify-content-end"><!--menu-button-->
+            <button class="btn btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
+              aria-controls="offcanvasTop"><i class="fa-solid fa-bars fa-flip-vertical fa-xl"
+                style="color: #242323;"></i></button>
+
+          </div><!--menu-button-->
+          {% endif %}
+        </div>
+      </div>
+      <!--------------------------offcanvas------------------------>
+
+      <div class="offcanvas offcanvas-start w-50" tabindex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
+        <div class="offcanvas-header">
+          <div class="col-2"><!--logo-->
+            <div class="logo-test"><a href="{% url 'home' %}?home=home" type="submit"><img
+                  src="../../static/main/img/logoMH.png" alt=""></a></div>
+          </div><!--logo-->
+
+          <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" style="padding-left: 0rem;">
+          <!--navbar-->
+          <div class="offcanvas-wrapper">
+
+            {% include "main/offcanvas.html" %}
+            
+
+
+          </div>
+          <!--navbar-->
+
+
+        </div>
+        <div class="offcanvas-footer align-content-center pb-3">
+          {% include "main/user-info.html" %}
+        </div>
+      </div>
+      <!--------------------------offcanvas------------------------>
+    </header>
+    {% block main %}{% endblock %}
+
+    <footer class="footer">
+      <div class="container-fluid" id="footer">
+        <div class="row">
+          <div class="col">
+            
+          </div>
+        </div>
+  </div>
+
+  </footer>
+  </div>
+  <script src="../../static/main/js/bootstrap5.js"></script>
+  <script src="../../static/main/js/icon_awesome.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
+
+
+
+
+  <script>
+    let tg = window.Telegram.WebApp;
+    window.addEventListener('load', () => {
+      tg.expand();
+  });
+  
+  </script>
+</body>
+
+</html>

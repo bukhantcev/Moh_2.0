@@ -1,0 +1,81 @@
+{% extends 'main/layout.html' %}
+
+{% block title %} Главная {% endblock %}
+
+{% block main %}
+<main class="main" id="main">
+  <div class="main-header">
+    <div class="container-fluid h-100">
+      <p class="main-title text-center h1" style="margin-top: 8rem; margin-bottom: 3rem;">
+        Расписание
+      </p>
+      <div class="row">
+        <div class="col d-flex justify-content-center">
+          <div class="dropdown"><!--------------------------calendar------------------------>
+            <button class="btn btn-secondary dropdown-toggle" style="margin-bottom: 1rem; margin-right: 0.5rem;"
+              type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ current_month }}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <form accept="" method="post" id="myForm"></form>
+              {% csrf_token %}
+              {% autoescape off %}
+              {{btn_month}}
+              {% endautoescape %}
+              </form>
+            </ul>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" style="margin-bottom: 1rem;" type="button"
+              id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ year_title }}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <a class="dropdown-item" href="?year=current" type="submit">{{ current_year }}</a>
+              <a class="dropdown-item" href="?year=next" type="submit">{{ next_year }}</a>
+              <a class="dropdown-item" href="?year=real" type="submit">{{ real_year }}</a>
+            </ul>
+          </div>
+        </div>
+      </div>
+    
+    </div>
+    <div class="container">
+      <div class="row row-cols-1 row-cols-xl-4 row-cols-md-3 g-4">
+        
+        {% autoescape off %}
+        {{cal}}
+        {% endautoescape %}
+      
+      </div>
+    </div><!--------------------------calendar------------------------>
+
+<!----------------------------------------------------------------------------ofcanvas-card-event----------
+
+    <div class="offcanvas offcanvas-top offcanvas-sm-start w-100 h-100 align-items-center" tabindex="-1" id="offcanvasCardEvent" aria-labelledby="offcanvasTopLabel">
+      <div class="offcanvas-header">
+        <h3 class="csrd-info  justify-content-center">Подробная информация</h3>
+
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        dsfsdhgdsfgsdghsdfgdfghdfh
+      </div>
+    </div>
+------------------------------------>
+<a id="auto-scroll" href="{{ today }}"></a> <!--Autoscrol today-->
+
+
+
+
+</main>
+
+<script>
+  window.addEventListener('load', () => {
+    document.getElementById('auto-scroll').click();
+});
+
+</script>
+
+
+{% endblock %}

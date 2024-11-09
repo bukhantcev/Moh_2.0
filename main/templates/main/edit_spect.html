@@ -1,0 +1,73 @@
+{% extends 'main/layout.html' %}
+
+{% block title %} Личный кабинет {% endblock %}
+
+
+
+
+
+{% block main %}
+<div class="row">
+    <div class="col d-flex justify-content-center" style="margin-top: 150px;">
+        <h1>{{ spect.name }}</h1>
+    </div>
+</div>
+<div class="container-fluid h-100 d-flex justify-content-center" style="margin-top: 2rem;">
+    <div class="row">
+        <div class="col justify-content-center">
+            
+                {% if spect.video == '' %}
+                <p>Видео пока нет {% if request.user.is_staff %}<button id="btn-edit-video" class="btn btn-primary" onclick="VideoURL(this)" type="button">Добавить</button>{% endif %}</p>
+                <form accept="" method="post" id="myForm", enctype="multipart/form-data">
+                    {% csrf_token %}
+                 
+                  <br><input type="text" id="inputVideoURL" name="newVideo" style="display: none;" value="{{ spect.video }}">
+                  <button id="btn-save-video" name="btn-save-video" value="{{ spect.id }}" class="btn btn-custom" onclick="VideoURL()" type="submit" style="display: none;">Сохранить</button>
+                </form>
+                
+                {% else %}
+                <div class="col d-none d-sm-flex">
+              <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+            <div class="col d-flex d-sm-none">
+                <iframe width="350" height="198" src="https://www.youtube.com/embed/{{ video }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+              </div>
+              <br>{% if request.user.is_staff %}<button id="btn-edit-video" class="btn btn-primary" onclick="VideoURL(this)" type="button">Изменить ссылку на видео</button>{% endif %}
+              <form accept="" method="post" id="myForm", enctype="multipart/form-data">
+                {% csrf_token %}
+             
+              <br><input type="text" id="inputVideoURL" name="newVideo" style="display: none;" value="{{ spect.video }}">
+              <button id="btn-save-video" name="btn-save-video" value="{{ spect.id }}" class="btn btn-custom" onclick="VideoURL()" type="submit" style="display: none; margin-bottom: 3rem;">Сохранить</button>
+            </form>
+
+                {% endif %}
+                <a href="folder?folder=svet_doc&id={{ spect.id }}"><button class="btn btn-custom">Свет</button></a><br>
+                <a href="folder?folder=zvuk_doc&id={{ spect.id }}"><button class="btn btn-custom">Звук</button></a><br>
+                <a href="folder?folder=video_doc&id={{ spect.id }}"><button class="btn btn-custom">Видео</button></a><br>
+                <a href="folder?folder=decor_doc&id={{ spect.id }}"><button class="btn btn-custom">Декорация</button></a><br>
+                <a href="folder?folder=rekv_doc&id={{ spect.id }}"><button class="btn btn-custom">Реквизит</button></a><br>
+                <a href="folder?folder=grim_doc&id={{ spect.id }}"><button class="btn btn-custom">Грим</button></a><br>
+                <a href="folder?folder=kostum_doc&id={{ spect.id }}"><button class="btn btn-custom">Костюм</button></a><br><br><br>
+
+                <button class="btn btn-primary" style="margin-bottom: 5rem;" type="button" onclick="BackToSpects()">Назад</button>
+
+
+        
+        </div>
+    </div>
+</div>
+ 
+<script>
+    function VideoURL(me){
+        document.getElementById('inputVideoURL').setAttribute('style', '');
+        me.setAttribute('style', 'display: none');
+        document.getElementById('btn-save-video').setAttribute('style', 'margin-bottom: 3rem;');
+    }
+</script>
+<script>
+    function BackToSpects(){
+        location = '/spects';
+    }
+</script>
+
+{% endblock %}

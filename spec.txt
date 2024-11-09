@@ -1,0 +1,7 @@
+pip install fontawesomefree
+pip install django-bootstrap-v5
+pip install crispy-bootstrap4
+pip install django-bootstrap4
+pip install ajax
+pip install django-jquery
+pip install popper

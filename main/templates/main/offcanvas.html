@@ -1,0 +1,61 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-none">
+  <div class="container-fluid justify-content-center">
+    <div class="navbar" id="navbarNavDropdown">
+      <ul class="navbar-nav  justify-content-center">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          ХПЧ
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <li><button type="button" class="btn btn-link text-decoration-none" data-bs-dismiss="offcanvas"
+              aria-label="Close"><a class="nav-link active" aria-current="page" href="#main">Свет</a></button></li>
+          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
+                class="nav-link active" aria-current="page" href="#main">Звук</a></button></li>
+          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
+                class="nav-link active" aria-current="page" href="#main">Видео</a></button></li>
+          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
+                class="nav-link active" aria-current="page" href="#main">Машинисты</a></button></li>
+          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
+                class="nav-link active" aria-current="page" href="#main">Реквизиторы</a></button></li>
+          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
+                class="nav-link active" aria-current="page" href="#main">Костюмеры</a></button></li>
+          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
+                class="nav-link active" aria-current="page" href="#main">Гриммеры</a></button></li>
+        </ul>
+        <li class="nav-item">
+          <a class="nav-link" href="/spects">Спектакли</a>
+        </li>
+
+        {% if request.user.is_staff %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink1" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            Инструменты
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink1" style="min-width: 12rem;">
+
+
+
+
+            <li><button type="button" class="btn btn-link text-decoration-none" data-bs-dismiss="offcanvas"
+                aria-label="Close"><a class="nav-link active" aria-current="page" onclick="AdminRedirect();" href="#"
+                  target="_top">Админ-страница</a></button></li>
+
+            <li><button type="button" class="btn btn-link text-decoration-none" data-bs-dismiss="offcanvas"
+              aria-label="Close"><a class="nav-link active" aria-current="page"
+                target="_top"><a href="?command=go_parsing">Расписание с сайта</a></button></li>
+
+
+            <script>
+              function AdminRedirect() {
+                location = "/admin";
+              }
+            </script>
+
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
