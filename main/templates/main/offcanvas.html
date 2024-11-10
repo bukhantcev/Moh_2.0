@@ -2,48 +2,47 @@
   <div class="container-fluid justify-content-center">
     <div class="navbar" id="navbarNavDropdown">
       <ul class="navbar-nav  justify-content-center">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown"
+        <a href="#" id="navbarDropdownMenuLink" data-bs-toggle="dropdown"
           aria-expanded="false">
-          ХПЧ
+          <button type="button" class="btn btn-custom btn-custom-header btn-custom-header-side">ХПЧ</button>
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <li><button type="button" class="btn btn-link text-decoration-none" data-bs-dismiss="offcanvas"
-              aria-label="Close"><a class="nav-link active" aria-current="page" href="#main">Свет</a></button></li>
-          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
-                class="nav-link active" aria-current="page" href="#main">Звук</a></button></li>
-          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
-                class="nav-link active" aria-current="page" href="#main">Видео</a></button></li>
-          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
-                class="nav-link active" aria-current="page" href="#main">Машинисты</a></button></li>
-          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
-                class="nav-link active" aria-current="page" href="#main">Реквизиторы</a></button></li>
-          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
-                class="nav-link active" aria-current="page" href="#main">Костюмеры</a></button></li>
-          <li><button type="button" class="btn btn-link" data-bs-dismiss="offcanvas" aria-label="Close"><a
-                class="nav-link active" aria-current="page" href="#main">Гриммеры</a></button></li>
+            <li><a aria-current="page" href="#main"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
+            aria-label="Close">Свет</button></a></li>
+            <li><a aria-current="page" href="#main"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
+            aria-label="Close">Звук</button></a></li>
+            <li><a aria-current="page" href="#main"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
+            aria-label="Close">Видео</button></a></li>
+            <li><a aria-current="page" href="#main"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
+            aria-label="Close">Машинисты</button></a></li>
+            <li><a aria-current="page" href="#main"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
+            aria-label="Close">Реквизит</button></a></li>
+            <li><a aria-current="page" href="#main"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
+            aria-label="Close">Грим</button></a></li>
+            <li><a aria-current="page" href="#main"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
+            aria-label="Close">Костюм</button></a></li>
+          
         </ul>
         <li class="nav-item">
-          <a class="nav-link" href="/spects">Спектакли</a>
+          <a href="/spects"><button type="button" class="btn btn-custom btn-custom-header btn-custom-header-side">Спектакли</button></a>
         </li>
 
         {% if request.user.is_staff %}
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink1" role="button"
+          <a href="#" id="navbarDropdownMenuLink1"
             data-bs-toggle="dropdown" aria-expanded="false">
-            Инструменты
+            <button type="button" class="btn btn-custom btn-custom-header btn-custom-header-side">Инструменты</button>
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink1" style="min-width: 12rem;">
 
 
 
 
-            <li><button type="button" class="btn btn-link text-decoration-none" data-bs-dismiss="offcanvas"
-                aria-label="Close"><a class="nav-link active" aria-current="page" onclick="AdminRedirect();" href="#"
-                  target="_top">Админ-страница</a></button></li>
-
-            <li><button type="button" class="btn btn-link text-decoration-none" data-bs-dismiss="offcanvas"
-              aria-label="Close"><a class="nav-link active" aria-current="page"
-                target="_top"><a href="?command=go_parsing">Расписание с сайта</a></button></li>
+            <li><a class="nav-link active" aria-current="page" onclick="AdminRedirect();" href="#"
+                  target="_top"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas" aria-label="Close">Админ-страница</button></a></li>
+            <li><a class="nav-link active" aria-current="page" href="?command=go_parsing"
+                target="_top"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
+                aria-label="Close">Расписание с сайта</button></a></li>
 
 
             <script>

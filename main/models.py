@@ -91,7 +91,7 @@ def calendar (result='', user_valid=False, card_header_bg_color='', author=''): 
     </div>
   </div>
 </div>\n'''
-        result = result + f'<div class="col h-100" style="padding-top: 4rem" id="id_card_{i+1}"><div class="card" style="height: 20rem" ><div class="card-header" style="font-size: 1rem; {today_color}">{i+1} {weekdays[date.weekday()]}</div><div class="card-body"><ul style="margin-right: 2rem">{event_li}</ul></p></div></div></div>\n'
+        result = result + f'<div class="col h-100" style="padding-top: 5rem" id="id_card_{i+1}"><div class="card" style="height: 20rem" ><div class="card-header" style="font-size: 1rem; {today_color}">{i+1} {weekdays[date.weekday()]}</div><div class="card-body"><ul style="margin-right: 2rem">{event_li}</ul></p></div></div></div>\n'
     return result
 
 def calendar_switch_month(): #---------------------MONTS

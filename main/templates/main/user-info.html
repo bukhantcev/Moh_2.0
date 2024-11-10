@@ -1,6 +1,5 @@
             <div class="header-top-phone d-flex align-items-center h-100 justify-content-end "
               style="padding-right: 3rem;">
-              <i class="fa-regular fa-user" style="padding-right: 0.5rem;"></i>
-              <a href="{% url 'room' %}" style="padding-right: 1rem;">{{ request.user.username }}</a>
-              <a href="{% url 'logout' %}" class="fa-solid fa-right-from-bracket"></a>
+              <a href="{% url 'room' %}" class="linkNbtn"><button class="btn btn-custom btn-custom-header btn-custom-header-user">{{ request.user.username }}</button></a>
+              <a href="{% url 'logout' %}" style="margin: 0 0 16px 16px; font-size: small;">Выход</a>
             </div>
