@@ -10,5 +10,6 @@ urlpatterns = [
     path('edit_spect', views.edit_spect, name='edit_spect'),
     path('open_pdf', views.load_file, name='open_pdf'),
     path('folder', views.folder, name='folder'),
+    path('workers', views.workers, name='workers'),
 ]
 

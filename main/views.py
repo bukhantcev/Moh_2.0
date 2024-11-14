@@ -3,8 +3,10 @@ import os
 import shutil
 from cProfile import label
 from lib2to3.fixes.fix_input import context
+from lib2to3.pgen2.tokenize import group
 
 from dateutil.utils import today
+from django.contrib.auth.models import User, Group
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import render, redirect
 from .models import calendar, calendar_switch_month, my_calendar, calendar_switch_year, autoscroll, Spect
@@ -15,6 +17,7 @@ from forms.parser import create_event
 import wget
 from django.forms.models import model_to_dict
 from .forms import SpectForm
+from accounts.models import Profile, Podrazdelenie, Dolgnost
 
 
 
@@ -26,10 +29,11 @@ from .forms import SpectForm
 
 
 def index(request):       #-------------MAIN
-    # if request.method == 'POST':
-    #     if 'FindFile' in request.POST:
-    #         wget.download(request.POST.get('FindFile'))
-
+    user_p = User.objects.all()
+    ammount_user = 0
+    for i in user_p:
+        if not i.groups.filter(name='podtvergdennie').exists():
+            ammount_user += 1
 
     if "command" in request.GET:    #-----ПАРСИНГ С САЙТА
         if 'go_parsing' in request.GET.get('command'):
@@ -128,7 +132,7 @@ def index(request):       #-------------MAIN
                 card_bg_color = ''#------TODAY
 
 
-        return render(request, 'main/index.html', context={'cal':calendar(result='', user_valid=request.user.is_staff,card_header_bg_color=card_bg_color, author=author), 'current_month': my_calendar.month_text[my_calendar.current_month], 'btn_month': calendar_switch_month(), 'current_year': calendar_switch_year()['current_year'], 'next_year': calendar_switch_year()['next_year'], 'real_year': calendar_switch_year()['real_year'], 'today': today, 'year_title': my_calendar.year_title})
+        return render(request, 'main/index.html', context={'cal':calendar(result='', user_valid=request.user.is_staff,card_header_bg_color=card_bg_color, author=author), 'current_month': my_calendar.month_text[my_calendar.current_month], 'btn_month': calendar_switch_month(), 'current_year': calendar_switch_year()['current_year'], 'next_year': calendar_switch_year()['next_year'], 'real_year': calendar_switch_year()['real_year'], 'today': today, 'year_title': my_calendar.year_title, 'ammount_user': ammount_user})
     else:
         return redirect('login')
 
@@ -139,24 +143,28 @@ def about(request):#--------------------------------------------ABOUT
 
 
 def spects(request):
-    if request.method == 'POST':
-        if 'deleteSpect' in request.POST:
-            spect = Spect.objects.get(id=request.POST.get('deleteSpect'))
-            shutil.rmtree(f'materials/{spect.name}')
-            spect.delete()
-            spect = Spect.objects.all
-            context = {
-                'spects': spect
-            }
-            return redirect('spects')
+    user = User.objects.get(username=request.user.username)
+    if user.groups.filter(name='podtvergdennie').exists():
+        if request.method == 'POST':
+            if 'deleteSpect' in request.POST:
+                spect = Spect.objects.get(id=request.POST.get('deleteSpect'))
+                shutil.rmtree(f'materials/{spect.name}')
+                spect.delete()
+                spect = Spect.objects.all
+                context = {
+                    'spects': spect
+                }
+                return redirect('spects')
 
 
-    spect = Spect.objects.all
-    context = {
-        'spects': spect
-    }
+        spect = Spect.objects.all
+        context = {
+            'spects': spect
+        }
 
-    return render(request, 'main/spects.html', context=context)
+        return render(request, 'main/spects.html', context=context)
+    else:
+        return render(request, 'main/sorry.html')
 
 
 def add_spect(request):
@@ -265,44 +273,105 @@ def handle_uploaded_file(f, name,  folder):
 
 
 def folder(request):
+    user = User.objects.get(username=request.user.username)
+    if user.groups.filter(name='podtvergdennie').exists():
+        if request.method == 'GET':
+            if 'folder' in request.GET and 'id' in request.GET:
+                spect = Spect.objects.get(id=request.GET.get("id"))
+                path = f'materials/{spect.name}/{request.GET.get("folder")}'
+                try:
+                    os.mkdir(path)
+                    list_file = os.listdir(path)
+                    print(list_file)
+                except:
+
+                    list_file = os.listdir(path)
+                    print(list_file)
+                context = {
+                    'spect': spect,
+                    'folder': request.GET.get("folder"),
+                    'files': list_file,
+                }
+                if 'status' in request.GET:
+                    if request.GET.get('status') == 'delete':
+                        try:
+                            os.remove(request.GET.get('path'))
+                        except:
+                            pass
+                return render(request, 'main/folder.html', context=context)
+
+        if request.method == 'POST':
+            if 'addFile' in request.POST:
+                print(request.FILES.getlist('upload_files', [])[0])
+                spect = Spect.objects.get(id=str(request.POST.get("addFile")).split('$')[0])
+                folder = str(request.POST.get("addFile")).split('$')[1]
+                for file in request.FILES.getlist('upload_files', []):
+
+                    handle_uploaded_file(file, spect.name, folder)
+                path = f'materials/{spect.name}/{folder}'
+                list_file = os.listdir(path)
+                context = {
+                    'spect': spect,
+                    'folder': folder,
+                    'files': list_file,
+                }
+                return render(request, 'main/folder.html', context=context)
+    else:
+        return render(request, 'main/sorry.html')
+
+def workers(request):
+    user = User.objects.get(username=request.user.username)
     if request.method == 'GET':
-        if 'folder' in request.GET and 'id' in request.GET:
-            spect = Spect.objects.get(id=request.GET.get("id"))
-            path = f'materials/{spect.name}/{request.GET.get("folder")}'
-            try:
-                os.mkdir(path)
-                list_file = os.listdir(path)
-                print(list_file)
-            except:
 
-                list_file = os.listdir(path)
-                print(list_file)
-            context = {
-                'spect': spect,
-                'folder': request.GET.get("folder"),
-                'files': list_file,
-            }
-            if 'status' in request.GET:
-                if request.GET.get('status') == 'delete':
-                    try:
-                        os.remove(request.GET.get('path'))
-                    except:
-                        pass
-            return render(request, 'main/folder.html', context=context)
+        if  user.groups.filter(name='podtvergdennie').exists():
 
-    if request.method == 'POST':
-        if 'addFile' in request.POST:
-            print(request.FILES.getlist('upload_files', [])[0])
-            spect = Spect.objects.get(id=str(request.POST.get("addFile")).split('$')[0])
-            folder = str(request.POST.get("addFile")).split('$')[1]
-            for file in request.FILES.getlist('upload_files', []):
+            if 'podr' in request.GET:
+                if request.GET.get('podr') == 'svet':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Свет').id).order_by('sort_index')
+                    context = {
+                        "users": users
+                    }
+                elif request.GET.get('podr') == 'zvuk':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Звук').id).order_by('sort_index')
+                    context = {
+                        "users": users
+                    }
+                elif request.GET.get('podr') == 'video':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Видео').id).order_by(
+                        'sort_index')
+                    context = {
+                        "users": users
+                    }
+                elif request.GET.get('podr') == 'decor':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Декорации').id).order_by(
+                        'sort_index')
+                    context = {
+                        "users": users
+                    }
+                elif request.GET.get('podr') == 'rekv':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Реквизит').id).order_by(
+                        'sort_index')
+                    context = {
+                        "users": users
+                    }
+                elif request.GET.get('podr') == 'grim':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Грим').id).order_by(
+                        'sort_index')
+                    context = {
+                        "users": users
+                    }
+                elif request.GET.get('podr') == 'kostum':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Костюм').id).order_by(
+                        'sort_index')
+                    context = {
+                        "users": users
+                    }
 
-                handle_uploaded_file(file, spect.name, folder)
-            path = f'materials/{spect.name}/{folder}'
-            list_file = os.listdir(path)
-            context = {
-                'spect': spect,
-                'folder': folder,
-                'files': list_file,
-            }
-            return render(request, 'main/folder.html', context=context)
+                return render(request, 'main/workers.html', context)
+            else:
+                return render(request, 'main/workers.html')
+        else:
+            return render(request, 'main/sorry.html')
+
+    else:
+        return render(request, 'main/workers.html')

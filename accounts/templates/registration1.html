@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+{% block main %}
+
+<header style="box-shadow: 2px 2px 2px 1px rgba(0,0,0, .2);">
+  <div class="container-fluid d-flex p-10" style="flex-direction: column;">
+    <div class="row">
+      <div class="col align-items-left">
+        <img src="../../static/main/img/logoMH.png" style="width: 5rem; height: 5rem;" alt="">
+      </div>
+    </div>
+  </div>
+</header>
+<main style="margin-top: 10rem;">
+  <div class="container-fluid d-flex justify-content-center">
+    <div class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <h2>Регистрация</h2>
+            
+            <form method="POST" action="{% url 'registration1' %}">
+              {% csrf_token %}
+              <input value="{{username}}" name="username" disabled type="text">
+             
+            
+              {% for field in form %}
+              <p>
+                {% if field.errors %}
+              <ul class="errorlist">
+                {% for error in field.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+              {{ field.label_tag }}<br> {{ field }}
+              </p>
+              {% endfor %}
+              <button class="btn btn-success" name="username" style="margin-bottom: 2rem;" value="{{username}}" type="submit">Сохранить</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock %}
+

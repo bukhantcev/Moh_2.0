@@ -1,0 +1,78 @@
+{% extends 'main/layout.html' %}
+
+{% block title %} Личный кабинет {% endblock %}
+
+{% load my_filters %}
+
+
+
+{% block main %}
+<div class="row">
+    <div class="col d-flex justify-content-center" style="margin-top: 150px;">
+        <h1>{{ spect.name }}</h1>
+    </div>
+</div>
+<div class="container-fluid h-100 d-flex justify-content-center" style="margin-top: 2rem;">
+    <div class="row">
+        <div class="col justify-content-center">
+            <div class="row" style="background-color: #d2cef5; margin-bottom: 0.5rem;">
+                <div class="col">
+                    <h6>
+                        Сотрудник
+                    </h6>
+                </div>
+                <div class="col">
+                    <h6>
+                        Должность
+                    </h6>
+                </div>
+                <div class="col">
+                    <h6>
+                        Телефон
+                    </h6>
+                </div>
+            </div>
+
+            {% for user in users %}
+            {% if forloop.counter|chet  %}
+            <div class="row" style="background-color: rgb(161, 159, 186);">
+            {% else %}
+            <div class="row" style="background-color: rgb(135, 131, 184);">
+            {% endif %}
+            <div class="col d-flex justify-content-start">
+                <p class="workers">{{ user.first_name }} {{ user.last_name }}</p>
+            </div>
+            <div class="col d-flex justify-content-start">
+                <p class="workers">{{ user.dolgnost }}</p>
+            </div>
+            <div class="col d-flex justify-content-start">
+                <p class="workers"><a class="lnkPhone" href="tel: {{ user.phone }}">{{ user.phone }}</a></p>
+            </div>
+            </div>
+
+     
+            {% endfor %}
+
+
+                <button class="btn btn-primary" style="margin-bottom: 5rem;" type="button" onclick="BackToMain()">Назад</button>
+
+
+        
+        </div>
+    </div>
+</div>
+ 
+<script>
+    function VideoURL(me){
+        document.getElementById('inputVideoURL').setAttribute('style', '');
+        me.setAttribute('style', 'display: none');
+        document.getElementById('btn-save-video').setAttribute('style', 'margin-bottom: 3rem;');
+    }
+</script>
+<script>
+    function BackToMain(){
+        location = '/';
+    }
+</script>
+
+{% endblock %}

@@ -29,6 +29,17 @@ h1, h3 {
     text-shadow: 1px 1px 2px rgb(248, 248, 248);
 }
 
+h6 {
+    color: #424040;
+    text-shadow: 1px 1px 2px rgb(248, 248, 248);
+    margin-bottom: 0px;
+}
+.workers {
+    color: #313030;
+    text-shadow: 1px 1px 2px rgb(203, 190, 179);
+    margin-bottom: 0px;
+}
+
 html, body{
     height: 100%;
 }
@@ -49,7 +60,20 @@ a {
 .linkNbtn {
 
     transition: .15s ease;
+
 }
+
+.lnkPhone{
+    color: #1200b0;
+}
+
+.lnkPhone:hover {
+    color: #1900fd;
+    font-size: 1.1rem;
+    transition: 0.3s ease;
+}
+
+
 body{
     min-width: 334px;
     font-family: "Roboto", sans-serif;

@@ -27,7 +27,7 @@
           </div><!--logo-->
           {% url 'home' as home %}
           {% url 'room' as room %}
-          {% if request.path == home or request.path == room %}
+          {% if request.path == home %}
           <div class="col-8 d-none d-lg-block"><!--navbar-->
             {% include "main/offcanvas.html" %}
           </div><!--navbar-->

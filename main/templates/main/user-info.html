@@ -1,5 +1,12 @@
             <div class="header-top-phone d-flex align-items-center h-100 justify-content-end "
               style="padding-right: 3rem;">
-              <a href="{% url 'room' %}" class="linkNbtn"><button class="btn btn-custom btn-custom-header btn-custom-header-user">{{ request.user.username }}</button></a>
+              <a href="{% url 'room' %}" class="linkNbtn"><button class="btn btn-custom btn-custom-header btn-custom-header-user" style="position: relative;">{{ request.user.username }}
+                {% if ammount_user != 0 and request.user.is_staff %}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {{ammount_user}}
+                  <span class="visually-hidden">unread messages</span>
+                </span>
+                {% endif %}
+              </button></a>
               <a href="{% url 'logout' %}" style="margin: 0 0 16px 16px; font-size: small;">Выход</a>
             </div>

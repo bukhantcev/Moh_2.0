@@ -1,7 +1,7 @@
 from django.contrib.auth import views, logout
 from django.urls import path
 from django.contrib import admin
-from .views import registration
+from .views import registration, registration1
 from . import views as local_view
 
 urlpatterns = [
@@ -16,5 +16,7 @@ urlpatterns = [
     path('password-change/', views.PasswordChangeView.as_view(), name='password_change'),
     path('password-change/done/', views.PasswordChangeDoneView.as_view(), name='password_change_done'),
     path('admin/', admin.site.urls),
-    path('', registration, name='register')
+    path('', registration, name='register'),
+    path('registration1', registration1, name='registration1')
+
 ]
