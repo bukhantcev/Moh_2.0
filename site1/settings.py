@@ -58,6 +58,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'site1.urls'
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://mohnatii.ru",
+    "https://www.mohnatii.ru",
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
