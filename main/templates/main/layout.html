@@ -35,16 +35,28 @@
           <div class="col-2 d-none d-lg-block">
             {% include "main/user-info.html" %}
           </div>
-          
-
-
           <div class="col d-flex d-lg-none justify-content-end"><!--menu-button-->
             <button class="btn btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
               aria-controls="offcanvasTop"><i class="fa-solid fa-bars fa-flip-vertical fa-xl"
                 style="color: #242323;"></i></button>
 
           </div><!--menu-button-->
+          {% elif request.path == room  %}
+          <div class="col-8 d-none d-lg-block"><!--navbar-->
+            {% include "room/offcanvas.html" %}
+          </div><!--navbar-->
+          <div class="col d-flex d-lg-none justify-content-end"><!--menu-button-->
+            <button class="btn btn-menu" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTop"
+              aria-controls="offcanvasTop"><i class="fa-solid fa-bars fa-flip-vertical fa-xl"
+                style="color: #242323;"></i></button>
+
+          </div><!--menu-button-->
+          
+
+
+          
           {% endif %}
+
         </div>
       </div>
       <!--------------------------offcanvas------------------------>
@@ -61,8 +73,11 @@
         <div class="offcanvas-body" style="padding-left: 0rem;">
           <!--navbar-->
           <div class="offcanvas-wrapper">
-
+            {% if request.path == home %}
             {% include "main/offcanvas.html" %}
+            {% elif request.path == room  %}
+            {% include "room/offcanvas.html" %}
+            {% endif %}
             
 
 
@@ -71,9 +86,12 @@
 
 
         </div>
+        {% if request.path == home %}
         <div class="offcanvas-footer align-content-center pb-3">
+          
           {% include "main/user-info.html" %}
         </div>
+        {% endif %}
       </div>
       <!--------------------------offcanvas------------------------>
     </header>
