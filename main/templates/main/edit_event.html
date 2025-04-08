@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Редактировать событие</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #a6a0c3;
+    }
+    .card {
+      margin: 2rem auto;
+      max-width: 700px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .card-header {
+      background-color: #d4cef1;
+      font-weight: bold;
+      font-size: 1.3rem;
+      text-align: center;
+    }
+    .form-label {
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        Редактировать событие
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label">Дата и время:</label>
+            <input type="datetime-local" class="form-control" name="date" value="{{ date }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Тип:</label>
+            <select name="type" class="form-select">
+              {% for t in types %}
+                <option value="{{ t.id }}" {% if t.id == event.type.id %}selected{% endif %}>{{ t.type }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Название:</label>
+            <select name="name" class="form-select">
+              {% for n in names %}
+                <option value="{{ n.id }}" {% if n.id == event.name.id %}selected{% endif %}>{{ n.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Место проведения:</label>
+            <select name="location" class="form-select">
+              {% for l in locations %}
+                <option value="{{ l.id }}" {% if l.id == event.location.id %}selected{% endif %}>{{ l.location }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Уточнения:</label>
+            <textarea name="utochneniya" class="form-control" rows="3">{{ event.utochneniya }}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Службы:</label><br>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="svet" {% if event.svet == "Да" %}checked{% endif %}>
+              <label class="form-check-label">Свет</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="zvuk" {% if event.zvuk == "Да" %}checked{% endif %}>
+              <label class="form-check-label">Звук</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="video" {% if event.video == "Да" %}checked{% endif %}>
+              <label class="form-check-label">Видео</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="decor" {% if event.decor == "Да" %}checked{% endif %}>
+              <label class="form-check-label">Декорации</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="rekvizit" {% if event.rekvizit == "Да" %}checked{% endif %}>
+              <label class="form-check-label">Реквизит</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="grim" {% if event.grim == "Да" %}checked{% endif %}>
+              <label class="form-check-label">Грим</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="checkbox" name="kostum" {% if event.kostum == "Да" %}checked{% endif %}>
+              <label class="form-check-label">Костюм</label>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-success">Сохранить изменения</button>
+            <a href="/" class="btn btn-secondary">Отмена</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

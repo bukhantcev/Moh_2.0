@@ -49,40 +49,33 @@ def index(request):       #-------------MAIN
 
 
                 old_events = Event.objects.all()
-                for url in url_list:
-                    for name in create_event(url):
-                        event_names = Event_name.objects.all()
-                        event_location = Event_location.objects.all()
-                        index = 0
-                        for event in event_names:
+                events = create_event(url)
 
-                            if name['name'] == str(event):
-                                index = 1
-                        if index == 0:
-                            record = Event_name(name=name['name'])
-                            record.save()
+                # сохранить новые названия и локации
+                for name in events:
+                    if not Event_name.objects.filter(name=name['name']).exists():
+                        Event_name.objects.create(name=name['name'])
 
-                        for event_l in event_location:
+                    if not Event_location.objects.filter(location=name['location'].strip()).exists():
+                        Event_location.objects.create(location=name['location'].strip())
 
-                            if name['location'] == str(event_l.location):
-                                index = 1
-                        if index == 0:
-                            record_l = Event_location(location=name['location'].strip())
-                            record_l.save()
-                    for new_event in create_event(url):
-                        control_str = ''
-                        str_from_request = f'{new_event["date"]}{new_event["name"]}Спектакль'
-                        location = new_event['location'].strip()
-                        control_index = 0
-                        for i in old_events:
-                            control_str = f'{i.date}{i.name}{i.type}'
-                            str_from_request = f'{new_event["date"]}{new_event["name"]}Спектакль'
-                            if control_str == str_from_request:
-                                control_index = 1
+                # сохранить сами события
+                for new_event in events:
+                    str_from_request = f'{new_event["date"]}{new_event["name"]}Спектакль{new_event["location"].strip()}'
+                    duplicate = False
+                    for i in old_events:
+                        control_str = f'{i.date}{i.name}{i.type}{i.location}'
+                        if control_str == str_from_request:
+                            duplicate = True
+                            break
 
-                        if control_index == 0:
-                            record = Event(date=new_event['date'], name=Event_name.objects.get(name=new_event['name']), type=Event_type.objects.get(type="Спектакль"))
-                            record.save()
+                    if not duplicate:
+                        Event.objects.create(
+                            date=new_event['date'],
+                            name=Event_name.objects.get(name=new_event['name']),
+                            type=Event_type.objects.get(type="Спектакль"),
+                            location=Event_location.objects.get(location=new_event['location'].strip())
+                        )
             except:
                 print('Что-то пошло не так...')
 
@@ -375,3 +368,78 @@ def workers(request):
 
     else:
         return render(request, 'main/workers.html')
+
+
+
+
+def add_event(request):
+    if request.method == 'POST':
+        date = request.POST.get('date')
+        type_id = request.POST.get('type')
+        name_id = request.POST.get('name')
+        location_id = request.POST.get('location')
+        utochneniya = request.POST.get('utochneniya', '')
+
+        get = lambda x: 'Да' if request.POST.get(x) else 'Нет'
+
+        Event.objects.create(
+            date=date,
+            type=Event_type.objects.get(id=type_id),
+            name=Event_name.objects.get(id=name_id),
+            location=Event_location.objects.get(id=location_id),
+            utochneniya=utochneniya,
+            svet=get('svet'),
+            zvuk=get('zvuk'),
+            video=get('video'),
+            decor=get('decor'),
+            rekvizit=get('rekvizit'),
+            grim=get('grim'),
+            kostum=get('kostum'),
+        )
+        return redirect('/')
+
+    date = request.GET.get('date')
+    # Преобразуем в datetime-local формат
+    if date:
+        date += 'T19:00'  # Устанавливаем дефолтное время
+    context = {
+        'date': date,
+        'types': Event_type.objects.all(),
+        'names': Event_name.objects.all(),
+        'locations': Event_location.objects.all()
+    }
+    return render(request, 'main/add_event.html', context)
+
+def edit_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        event.date = request.POST.get('date')
+        event.type_id = request.POST.get('type')
+        event.name_id = request.POST.get('name')
+        event.location_id = request.POST.get('location')
+        event.utochneniya = request.POST.get('utochneniya', '')
+        get = lambda x: 'Да' if request.POST.get(x) else 'Нет'
+        event.svet = get('svet')
+        event.zvuk = get('zvuk')
+        event.video = get('video')
+        event.decor = get('decor')
+        event.rekvizit = get('rekvizit')
+        event.grim = get('grim')
+        event.kostum = get('kostum')
+        event.save()
+        return redirect('/')
+
+    context = {
+        'event': event,
+        'date': event.date.strftime('%Y-%m-%dT%H:%M'),
+        'types': Event_type.objects.all(),
+        'names': Event_name.objects.all(),
+        'locations': Event_location.objects.all()
+    }
+    return render(request, 'main/edit_event.html', context)
+from django.shortcuts import get_object_or_404
+
+def delete_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    event.delete()
+    return redirect('/')
