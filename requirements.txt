@@ -1,8 +1,8 @@
-django==4.2.16
+django
 django-bootstrap-v5
 django-jquery==3.1.0
 popper==2020.9.1
-
+dotenv
 crispy-bootstrap4
 django-colorfield
 django-admin-interface
