@@ -16,8 +16,8 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # Тут нужно указать название канала в ссылке,которое начинается с @
 # Тут я указал для примера созданный канал
-# CHAT_ID = "-1002170807806"
-CHAT_ID = "404354012"
+CHAT_ID = "-1002170807806"
+# CHAT_ID = "404354012"
 THREAD_ID = '2'
 
 
@@ -48,19 +48,19 @@ def send_telegram_message(id, author=''):
     api_url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
 
     #Указаваем в параметрах CHAT_ID и само сообщение
-    # input_data = json.dumps(
-    #     {
-    #         'chat_id': CHAT_ID,
-    #         'message_thread_id' : THREAD_ID,
-    #         'text': text,
-    #     }
-    # ).encode()
     input_data = json.dumps(
         {
             'chat_id': CHAT_ID,
+            'message_thread_id' : THREAD_ID,
             'text': text,
         }
     ).encode()
+    # input_data = json.dumps(
+    #     {
+    #         'chat_id': CHAT_ID,
+    #         'text': text,
+    #     }
+    # ).encode()
 
     try:
         req = urllib.request.Request(
