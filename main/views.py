@@ -171,12 +171,13 @@ def add_spect(request):
 
 
             spect.save()
+            os.makedirs('materials', exist_ok=True)
             try:
                 os.rename('materials/q', f'materials/{spect.label}')
             except:
                 pass
             try:
-                os.mkdir(f'materials/{spect.label}')
+                os.makedirs(f'materials/{spect.label}', exist_ok=True)
             except:
                 pass
 
@@ -260,6 +261,7 @@ def load_file(request):
 
 
 def handle_uploaded_file(f, name,  folder):
+    os.makedirs(f'materials/{name}/{folder}', exist_ok=True)
     with open(f'materials/{name}/{folder}/{f.name}', 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
@@ -273,7 +275,7 @@ def folder(request):
                 spect = Spect.objects.get(id=request.GET.get("id"))
                 path = f'materials/{spect.name}/{request.GET.get("folder")}'
                 try:
-                    os.mkdir(path)
+                    os.makedirs(path, exist_ok=True)
                     list_file = os.listdir(path)
                     print(list_file)
                 except:
