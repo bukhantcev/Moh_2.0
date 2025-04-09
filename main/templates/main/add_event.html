@@ -1,4 +1,3 @@
-<!-- main/templates/add_event.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -45,7 +44,7 @@
             <label class="form-label">Тип:</label>
             <select name="type" class="form-select">
               {% for t in types %}
-                <option value="{{ t.id }}">{{ t.type }}</option>
+                <option value="{{ t.id }}" {% if t.id == selected_type %}selected{% endif %}>{{ t.type }}</option>
               {% endfor %}
             </select>
           </div>
@@ -54,7 +53,7 @@
             <label class="form-label">Название:</label>
             <select name="name" class="form-select">
               {% for n in names %}
-                <option value="{{ n.id }}">{{ n.name }}</option>
+                <option value="{{ n.id }}" {% if n.id == selected_name %}selected{% endif %}>{{ n.name }}</option>
               {% endfor %}
             </select>
           </div>
@@ -63,51 +62,51 @@
             <label class="form-label">Место проведения:</label>
             <select name="location" class="form-select">
               {% for l in locations %}
-                <option value="{{ l.id }}">{{ l.location }}</option>
+                <option value="{{ l.id }}" {% if l.id == selected_location %}selected{% endif %}>{{ l.location }}</option>
               {% endfor %}
             </select>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Уточнения:</label>
-            <textarea name="utochneniya" class="form-control" rows="3"></textarea>
+            <textarea name="utochneniya" class="form-control" rows="3">{{ utochneniya }}</textarea>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Службы:</label><br>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="svet" checked>
+              <input class="form-check-input" type="checkbox" name="svet" {% if svet %}checked{% endif %}>
               <label class="form-check-label">Свет</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="zvuk" checked>
+              <input class="form-check-input" type="checkbox" name="zvuk" {% if zvuk %}checked{% endif %}>
               <label class="form-check-label">Звук</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="video" checked>
+              <input class="form-check-input" type="checkbox" name="video" {% if video %}checked{% endif %}>
               <label class="form-check-label">Видео</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="decor" checked>
+              <input class="form-check-input" type="checkbox" name="decor" {% if decor %}checked{% endif %}>
               <label class="form-check-label">Декорации</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="rekvizit" checked>
+              <input class="form-check-input" type="checkbox" name="rekvizit" {% if rekvizit %}checked{% endif %}>
               <label class="form-check-label">Реквизит</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="grim" checked>
+              <input class="form-check-input" type="checkbox" name="grim" {% if grim %}checked{% endif %}>
               <label class="form-check-label">Грим</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="kostum" checked>
+              <input class="form-check-input" type="checkbox" name="kostum" {% if kostum %}checked{% endif %}>
               <label class="form-check-label">Костюм</label>
             </div>
           </div>
 
           <div class="text-center">
             <button type="submit" class="btn btn-success">Сохранить</button>
-            <a href="/" class="btn btn-secondary">Отмена</a>
+            <a href="/?scroll_to={{ date|slice:":10" }}" class="btn btn-secondary">Отмена</a>
           </div>
         </form>
       </div>

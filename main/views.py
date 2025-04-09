@@ -398,10 +398,35 @@ def add_event(request):
             grim=get('grim'),
             kostum=get('kostum'),
         )
-        return redirect('/')
+        scroll_to = date[:10]
+        return redirect(f"/?scroll_to={scroll_to}")
+
+    copy_id = request.GET.get('copy_id')
+    if copy_id:
+        try:
+            original = Event.objects.get(id=copy_id)
+            context = {
+                'date': original.date.strftime('%Y-%m-%dT%H:%M'),
+                'types': Event_type.objects.all(),
+                'names': Event_name.objects.all(),
+                'locations': Event_location.objects.all(),
+                'selected_type': original.type.id,
+                'selected_name': original.name.id,
+                'selected_location': original.location.id,
+                'utochneniya': original.utochneniya,
+                'svet': original.svet == 'Да',
+                'zvuk': original.zvuk == 'Да',
+                'video': original.video == 'Да',
+                'decor': original.decor == 'Да',
+                'rekvizit': original.rekvizit == 'Да',
+                'grim': original.grim == 'Да',
+                'kostum': original.kostum == 'Да',
+            }
+            return render(request, 'main/add_event.html', context)
+        except Event.DoesNotExist:
+            pass
 
     date = request.GET.get('date')
-    # Преобразуем в datetime-local формат
     if date:
         date += 'T19:00'  # Устанавливаем дефолтное время
     context = {
@@ -415,7 +440,7 @@ def add_event(request):
 def edit_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     if request.method == 'POST':
-        event.date = request.POST.get('date')
+        event.date = datetime.datetime.strptime(request.POST.get('date'), '%Y-%m-%dT%H:%M')
         event.type_id = request.POST.get('type')
         event.name_id = request.POST.get('name')
         event.location_id = request.POST.get('location')
@@ -429,7 +454,8 @@ def edit_event(request, event_id):
         event.grim = get('grim')
         event.kostum = get('kostum')
         event.save()
-        return redirect('/')
+        scroll_to = event.date.strftime('%Y-%m-%d')
+        return redirect(f"/?scroll_to={scroll_to}")
 
     context = {
         'event': event,
@@ -443,5 +469,6 @@ from django.shortcuts import get_object_or_404
 
 def delete_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+    scroll_to = event.date.date()
     event.delete()
-    return redirect('/')
+    return redirect(f"/?scroll_to={scroll_to}")

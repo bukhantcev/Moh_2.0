@@ -2,12 +2,9 @@ import datetime
 from calendar import monthrange
 from django.db import models
 import os
-
-
-
 from forms.models import Event, Event_type
-
 from room.models import MyEvents
+from django.shortcuts import redirect
 
 #----------------------------------------CALENDAR
 month_text = {1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь', 7: 'Июль', 8: 'Август',
@@ -56,7 +53,7 @@ def calendar(result='', user_valid=False, card_header_bg_color='', author=''):
                 event_type_for_color = Event_type.objects.get(type=str(ev_type))
                 btn_color = f'background-color: {event_type_for_color.button_color}; border-color: {event_type_for_color.button_color}'
                 ev_location = event.location
-                ev_utochneniya = f'<h5 style="color: red">Описание:<br></h5><p>{event.utochneniya}</p>' if event.utochneniya != '' else ''
+                ev_utochneniya = f'<h5 style="color: red">Описание:<br></h5><p>{event.utochneniya}</p>' if event.utochneniya and event.utochneniya.strip() else ''
                 staff_lines = []
                 if event.svet == 'Да':
                     staff_lines.append('Свет')
@@ -80,10 +77,16 @@ def calendar(result='', user_valid=False, card_header_bg_color='', author=''):
                 ''' if user_valid else ''
 
                 event_li += f'''
-                  <button type="button" class="btn btn-primary" style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {btn_color}" data-bs-toggle="modal" data-bs-target="#{id}">
-                    {ev_time} &quot;{ev_name}&quot; ({ev_type})
-                  </button>
-
+                  <div style="position: relative;">
+                    <button type="button" class="btn btn-primary" style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {btn_color}" data-bs-toggle="modal" data-bs-target="#{id}">
+                      {f'''<span style="position: absolute; top: 2px; right: 2px; z-index: 10; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                        <a href="/add_event/?copy_id={event.id}" class="btn btn-sm btn-success" title="Копировать событие" style="padding: 0; width: 100%; height: 100%;">
+                          <i class="bi bi-files"></i>
+                        </a>
+                      </span>''' if user_valid else ''}
+                      {ev_time} &quot;{ev_name}&quot; ({ev_type})
+                    </button>
+                  </div>
                   <div class="modal fade" id="{id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                       <div class="modal-content">
@@ -110,8 +113,8 @@ def calendar(result='', user_valid=False, card_header_bg_color='', author=''):
 
         plus_button = f'<a href="/add_event/?date={date.date()}" class="btn btn-sm btn-primary" style="background-color: #624ba7; border-color: #a6a0c3;" title="Добавить событие">+</a>' if user_valid else ''
         result += f'''
-        <div class="col h-100" style="padding-top: 5rem" id="id_card_{i + 1}">
-          <div class="card" style="height: 20rem">
+        <div class="col h-100 scroll-target" style="padding-top: 5rem" id="id_card_{i + 1}" data-date="{date.date()}">
+          <div class="card" style="height: 35rem">
             <div class="card-header d-flex justify-content-between align-items-center" style="font-size: 1rem; {today_color}">
               <span>{i + 1} {weekdays[date.weekday()]}</span>
               {plus_button}
@@ -135,7 +138,6 @@ def calendar_switch_month(): #---------------------MONTS
     for i in range(11):
         ind = my_calendar.current_month
         if i < (12-ind):
-
             ind = ind+i +1
             result.append(ind)
         else:
@@ -143,9 +145,6 @@ def calendar_switch_month(): #---------------------MONTS
             result.append(ind2)
     for i in result:
         final = final + f'<li><a class="dropdown-item" href="?month={i}" type="submit">{month_text[i]}</a></li>' + '\n'
-
-
-
 
     return final
 

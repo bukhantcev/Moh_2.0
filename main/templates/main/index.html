@@ -78,5 +78,18 @@
 
 </script>
 
+# JavaScript for smooth scrolling
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const scrollTo = params.get('scroll_to');
+    if (scrollTo) {
+      const target = document.querySelector(`[data-date="${scrollTo}"]`);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+</script>
 
 {% endblock %}
