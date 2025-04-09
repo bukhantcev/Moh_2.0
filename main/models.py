@@ -57,7 +57,22 @@ def calendar(result='', user_valid=False, card_header_bg_color='', author=''):
                 btn_color = f'background-color: {event_type_for_color.button_color}; border-color: {event_type_for_color.button_color}'
                 ev_location = event.location
                 ev_utochneniya = f'<h5 style="color: red">Описание:<br></h5><p>{event.utochneniya}</p>' if event.utochneniya != '' else ''
-                ev_staff = f'Свет - {event.svet}<br>Звук - {event.zvuk}<br>Видео - {event.video}<br>Декорации - {event.decor}<br>Реквизит - {event.rekvizit}<br>Грим - {event.grim}<br>Костюм - {event.kostum}'
+                staff_lines = []
+                if event.svet == 'Да':
+                    staff_lines.append('Свет')
+                if event.zvuk == 'Да':
+                    staff_lines.append('Звук')
+                if event.video == 'Да':
+                    staff_lines.append('Видео')
+                if event.decor == 'Да':
+                    staff_lines.append('Декорации')
+                if event.rekvizit == 'Да':
+                    staff_lines.append('Реквизит')
+                if event.grim == 'Да':
+                    staff_lines.append('Грим')
+                if event.kostum == 'Да':
+                    staff_lines.append('Костюм')
+                ev_staff = '<br>'.join(staff_lines)
 
                 action_buttons = f'''
                     <a href="/edit_event/{event.id}" class="btn btn-warning btn-sm">Редактировать</a>
@@ -175,4 +190,3 @@ class Spect(models.Model):
     class Meta:
         verbose_name = 'Спектакль'
         verbose_name_plural = 'Спектакли'
-
