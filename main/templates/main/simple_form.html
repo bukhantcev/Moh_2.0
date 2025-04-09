@@ -1,0 +1,46 @@
+{% extends 'main/layout.html' %}
+{% block main %}
+  <div class="container" style="margin-top: 6rem; max-width: 600px; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <h3 class="mb-3">{{ title }}</h3>
+
+    <form method="post">
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const form = document.querySelector("form");
+          const submitBtn = form.querySelector("button[type='submit']");
+          const requiredFields = Array.from(form.querySelectorAll("input, select, textarea")).filter(el => el.name && el.type !== "hidden");
+
+          function checkFormValidity() {
+            const allFilled = requiredFields.every(el => el.value.trim() !== "");
+            submitBtn.disabled = !allFilled;
+          }
+
+          requiredFields.forEach(el => {
+            el.addEventListener("input", checkFormValidity);
+          });
+
+          checkFormValidity();  // initial check
+        });
+      </script>
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label" style="font-weight: bold; color: red;">{{ field.label }}</label>
+          {% if field.name == "button_color" %}
+            <input type="color" name="{{ field.name }}" value="{{ field.value|default:'#ff0000' }}" class="form-control form-control-color">
+          {% else %}
+            {{ field }}
+          {% endif %}
+          {% if field.errors %}
+            <div class="text-danger small">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div class="d-flex justify-content-between mt-4">
+        <button type="submit" class="btn btn-success">Сохранить</button>
+        <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-secondary">Отмена</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

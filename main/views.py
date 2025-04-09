@@ -1,3 +1,4 @@
+from django import forms
 import datetime
 import os
 import shutil
@@ -38,18 +39,18 @@ def index(request):       #-------------MAIN
     if "command" in request.GET:    #-----ПАРСИНГ С САЙТА
         if 'go_parsing' in request.GET.get('command'):
             try:
-                url = "https://mikhalkov12.ru/playbill/"
+                base_url = "https://mikhalkov12.ru/playbill/"
                 this_month = datetime.datetime.now().month
                 this_year = datetime.datetime.now().year
-                url_list = [url]
-                for i in range(2):
-                    url_list.append(f"https://mikhalkov12.ru/playbill//?month={this_month+1+i}&year={this_year}")
-                event_names = Event_name.objects.all()
-                event_location = Event_location.objects.all()
-
+                urls_to_parse = [base_url] + [
+                    f"https://mikhalkov12.ru/playbill/?month={this_month + i}&year={this_year}"
+                    for i in range(1, 3)
+                ]
 
                 old_events = Event.objects.all()
-                events = create_event(url)
+                events = []
+                for url in urls_to_parse:
+                    events += create_event(url)
 
                 # сохранить новые названия и локации
                 for name in events:
@@ -64,7 +65,7 @@ def index(request):       #-------------MAIN
                     str_from_request = f'{new_event["date"]}{new_event["name"]}Спектакль{new_event["location"].strip()}'
                     duplicate = False
                     for i in old_events:
-                        control_str = f'{i.date}{i.name}{i.type}{i.location}'
+                        control_str = f'{i.date}{i.name.name}{i.type.type}{i.location.location}'
                         if control_str == str_from_request:
                             duplicate = True
                             break
@@ -472,3 +473,108 @@ def delete_event(request, event_id):
     scroll_to = event.date.date()
     event.delete()
     return redirect(f"/?scroll_to={scroll_to}")
+
+class EventTypeForm(forms.ModelForm):
+    class Meta:
+        model = Event_type
+        fields = ['type', 'button_color']
+
+def create_event_type(request):
+    if request.method == 'POST':
+        form = EventTypeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_event_types')
+    else:
+        form = EventTypeForm()
+    return render(request, 'main/simple_form.html', {'form': form, 'title': 'Новый тип мероприятия'})
+
+class EventNameForm(forms.ModelForm):
+    class Meta:
+        model = Event_name
+        fields = ['name']
+
+def create_event_name(request):
+    if request.method == 'POST':
+        form = EventNameForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_event_names')
+    else:
+        form = EventNameForm()
+    return render(request, 'main/simple_form.html', {'form': form, 'title': 'Новое название мероприятия'})
+
+class EventLocationForm(forms.ModelForm):
+    class Meta:
+        model = Event_location
+        fields = ['location', 'city']
+
+def create_event_location(request):
+    if request.method == 'POST':
+        form = EventLocationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_event_locations')
+    else:
+        form = EventLocationForm()
+    return render(request, 'main/simple_form.html', {'form': form, 'title': 'Новое место проведения'})
+
+def manage_event_types(request):
+    event_types = Event_type.objects.all()
+    return render(request, 'main/manage_event_types.html', {'event_types': event_types})
+
+def edit_event_type(request, pk):
+    instance = get_object_or_404(Event_type, pk=pk)
+    if request.method == 'POST':
+        form = EventTypeForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_event_types')
+    else:
+        form = EventTypeForm(instance=instance)
+    return render(request, 'main/simple_form.html', {'form': form, 'title': 'Редактировать тип мероприятия'})
+
+def delete_event_type(request, pk):
+    instance = get_object_or_404(Event_type, pk=pk)
+    instance.delete()
+    return redirect('manage_event_types')
+
+def manage_event_names(request):
+    event_names = Event_name.objects.all()
+    return render(request, 'main/manage_event_names.html', {'event_names': event_names})
+
+def edit_event_name(request, pk):
+    instance = get_object_or_404(Event_name, pk=pk)
+    if request.method == 'POST':
+        form = EventNameForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_event_names')
+    else:
+        form = EventNameForm(instance=instance)
+    return render(request, 'main/simple_form.html', {'form': form, 'title': 'Редактировать название мероприятия'})
+
+def delete_event_name(request, pk):
+    instance = get_object_or_404(Event_name, pk=pk)
+    instance.delete()
+    return redirect('manage_event_names')
+
+def manage_event_locations(request):
+    event_locations = Event_location.objects.all()
+    return render(request, 'main/manage_event_locations.html', {'event_locations': event_locations})
+
+def edit_event_location(request, pk):
+    instance = get_object_or_404(Event_location, pk=pk)
+    if request.method == 'POST':
+        form = EventLocationForm(request.POST, instance=instance)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_event_locations')
+    else:
+        form = EventLocationForm(instance=instance)
+    return render(request, 'main/simple_form.html', {'form': form, 'title': 'Редактировать место проведения'})
+
+def delete_event_location(request, pk):
+    instance = get_object_or_404(Event_location, pk=pk)
+    instance.delete()
+    return redirect('manage_event_locations')
