@@ -75,15 +75,15 @@ def calendar(result='', user_valid=False, card_header_bg_color='', author=''):
                     <a href="/edit_event/{event.id}" class="btn btn-warning btn-sm">Редактировать</a>
                     <a href="/delete_event/{event.id}" class="btn btn-danger btn-sm" onclick="return confirm('Удалить это событие?')">Удалить</a>
                 ''' if user_valid else ''
-
-                event_li += f'''
-                  <div style="position: relative;">
-                    <button type="button" class="btn btn-primary" style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {btn_color}" data-bs-toggle="modal" data-bs-target="#{id}">
-                      {f'''<span style="position: absolute; top: 2px; right: 2px; z-index: 10; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                btn_copy = f'''<span style="position: absolute; top: 2px; right: 2px; z-index: 10; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
                         <a href="/add_event/?copy_id={event.id}" class="btn btn-sm btn-success" title="Копировать событие" style="padding: 0; width: 100%; height: 100%;">
                           <i class="bi bi-files"></i>
                         </a>
-                      </span>''' if user_valid else ''}
+                      </span>''' if user_valid else ''
+                event_li += f'''
+                  <div style="position: relative;">
+                    <button type="button" class="btn btn-primary" style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {btn_color}" data-bs-toggle="modal" data-bs-target="#{id}">
+                      {btn_copy}
                       {ev_time} &quot;{ev_name}&quot; ({ev_type})
                     </button>
                   </div>
