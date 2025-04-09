@@ -27,19 +27,19 @@ def send_telegram_message(id, author=''):
     ev_data = f'{str(event.date).split(" ")[0].split("-")[2]}.{str(event.date).split(" ")[0].split("-")[1]}.{str(event.date).split(" ")[0].split("-")[0]}'
     ev_time = f'{str(event.date).split(" ")[1].split(":")[0]}:{str(event.date).split(" ")[1].split(":")[1]}'
     staff_list = []
-    if event.svet == 'да':
+    if event.svet == 'Да':
         staff_list.append('Свет')
-    if event.zvuk == 'да':
+    if event.zvuk == 'Да':
         staff_list.append('Звук')
-    if event.video == 'да':
+    if event.video == 'Да':
         staff_list.append('Видео')
-    if event.decor == 'да':
+    if event.decor == 'Да':
         staff_list.append('Декорации')
-    if event.rekvizit == 'да':
+    if event.rekvizit == 'Да':
         staff_list.append('Реквизит')
-    if event.grim == 'да':
+    if event.grim == 'Да':
         staff_list.append('Грим')
-    if event.kostum == 'да':
+    if event.kostum == 'Да':
         staff_list.append('Костюм')
     ev_staff = '\n'.join(staff_list)
     text = text_message = f'{author}\n\nДата: {ev_data}\n\nВремя: {ev_time}\n\nМесто проведения: {event.location}\n\n{event.type} "{event.name}"\n\nВызываются службы: \n{ev_staff}\n\nОписание: {event.utochneniya}'
