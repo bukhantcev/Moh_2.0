@@ -52,8 +52,8 @@ class Event(models.Model):
         ANSWER_NO = 'Нет', 'Нет'
 
     date = models.DateTimeField('Дата мероприятия', default=datetime.now())
-    type = models.ForeignKey(Event_type, on_delete=models.CASCADE, verbose_name='Тип мероприятия', blank=True)
-    name = models.ForeignKey(Event_name, on_delete=models.CASCADE, verbose_name='Название мероприятия')
+    type = models.ForeignKey(Event_type, on_delete=models.CASCADE, verbose_name='Тип мероприятия', blank=True, null=True)
+    name = models.ForeignKey(Event_name, on_delete=models.CASCADE, verbose_name='Название мероприятия', blank=True, null=True)
     location = models.ForeignKey(Event_location, on_delete=models.CASCADE, verbose_name='Место проведения мероприятия', blank=True, null=True)
     svet = models.CharField(choices=Staff.choices,verbose_name='Свет', max_length=150, default=Staff.ANSWER_YES)
     zvuk = models.CharField(choices=Staff.choices,verbose_name='Звук', max_length=150, default=Staff.ANSWER_YES)

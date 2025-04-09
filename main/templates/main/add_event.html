@@ -43,6 +43,7 @@
           <div class="mb-3">
             <label class="form-label">Тип:</label>
             <select name="type" class="form-select">
+              <option value="" disabled selected>Выбери тип события</option>
               {% for t in types %}
                 <option value="{{ t.id }}" {% if t.id == selected_type %}selected{% endif %}>{{ t.type }}</option>
               {% endfor %}
@@ -52,6 +53,7 @@
           <div class="mb-3">
             <label class="form-label">Название:</label>
             <select name="name" class="form-select">
+              <option value="" disabled selected>Выбери название события</option>
               {% for n in names %}
                 <option value="{{ n.id }}" {% if n.id == selected_name %}selected{% endif %}>{{ n.name }}</option>
               {% endfor %}
@@ -61,6 +63,7 @@
           <div class="mb-3">
             <label class="form-label">Место проведения:</label>
             <select name="location" class="form-select">
+              <option value="" disabled selected>Выбери место проведения</option>
               {% for l in locations %}
                 <option value="{{ l.id }}" {% if l.id == selected_location %}selected{% endif %}>{{ l.location }}</option>
               {% endfor %}
@@ -75,42 +78,64 @@
           <div class="mb-3">
             <label class="form-label">Службы:</label><br>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="svet" {% if svet %}checked{% endif %}>
+              <input class="form-check-input" type="checkbox" name="svet" checked>
               <label class="form-check-label">Свет</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="zvuk" {% if zvuk %}checked{% endif %}>
+              <input class="form-check-input" type="checkbox" name="zvuk" checked>
               <label class="form-check-label">Звук</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="video" {% if video %}checked{% endif %}>
+              <input class="form-check-input" type="checkbox" name="video" checked>
               <label class="form-check-label">Видео</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="decor" {% if decor %}checked{% endif %}>
+              <input class="form-check-input" type="checkbox" name="decor" checked>
               <label class="form-check-label">Декорации</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="rekvizit" {% if rekvizit %}checked{% endif %}>
+              <input class="form-check-input" type="checkbox" name="rekvizit" checked>
               <label class="form-check-label">Реквизит</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="grim" {% if grim %}checked{% endif %}>
+              <input class="form-check-input" type="checkbox" name="grim" checked>
               <label class="form-check-label">Грим</label>
             </div>
             <div class="form-check form-check-inline">
-              <input class="form-check-input" type="checkbox" name="kostum" {% if kostum %}checked{% endif %}>
+              <input class="form-check-input" type="checkbox" name="kostum" checked>
               <label class="form-check-label">Костюм</label>
             </div>
           </div>
 
           <div class="text-center">
-            <button type="submit" class="btn btn-success">Сохранить</button>
+            <button type="submit" class="btn btn-success" disabled>Сохранить</button>
             <a href="/?scroll_to={{ date|slice:":10" }}" class="btn btn-secondary">Отмена</a>
           </div>
         </form>
       </div>
     </div>
   </div>
+  <script>
+    const dateInput = document.querySelector('input[name="date"]');
+    const typeSelect = document.querySelector('select[name="type"]');
+    const nameSelect = document.querySelector('select[name="name"]');
+    const locationSelect = document.querySelector('select[name="location"]');
+    const submitBtn = document.querySelector('button[type="submit"]');
+
+    function toggleSubmit() {
+      const allFilled = dateInput.value &&
+                        typeSelect.value &&
+                        nameSelect.value &&
+                        locationSelect.value;
+      submitBtn.disabled = !allFilled;
+    }
+
+    [dateInput, typeSelect, nameSelect, locationSelect].forEach(el => {
+      el.addEventListener('input', toggleSubmit);
+      el.addEventListener('change', toggleSubmit);
+    });
+
+    window.addEventListener('DOMContentLoaded', toggleSubmit);
+  </script>
 </body>
 </html>
