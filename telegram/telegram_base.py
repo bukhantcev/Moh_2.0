@@ -32,10 +32,16 @@ def send_telegram_message(id, author=''):
     api_url = f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage'
 
     #Указаваем в параметрах CHAT_ID и само сообщение
+    # input_data = json.dumps(
+    #     {
+    #         'chat_id': CHAT_ID,
+    #         'message_thread_id' : THREAD_ID,
+    #         'text': text,
+    #     }
+    # ).encode()
     input_data = json.dumps(
         {
             'chat_id': CHAT_ID,
-            'message_thread_id' : THREAD_ID,
             'text': text,
         }
     ).encode()
