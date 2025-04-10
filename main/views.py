@@ -578,3 +578,33 @@ def delete_event_location(request, pk):
     instance = get_object_or_404(Event_location, pk=pk)
     instance.delete()
     return redirect('manage_event_locations')
+
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.http import JsonResponse
+
+@csrf_exempt
+def update_event_date(request, event_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            new_date_str = data.get('date')
+            is_copy = data.get('copy') == True or data.get('copy') == 'true'
+
+            if not new_date_str:
+                return JsonResponse({'error': 'No date provided'}, status=400)
+
+            original_event = get_object_or_404(Event, id=event_id)
+
+            old_time = original_event.date.time()
+            new_date = datetime.datetime.strptime(new_date_str, '%Y-%m-%d').date()
+
+            if is_copy:
+                original_event.pk = None  # копия
+            original_event.date = datetime.datetime.combine(new_date, old_time)
+            original_event.save()
+
+            return JsonResponse({'status': 'ok'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'error': 'Invalid method'}, status=405)

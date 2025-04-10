@@ -85,46 +85,80 @@ def calendar(result='', user_valid=False, card_header_bg_color='', author=''):
                          <li><a class='dropdown-item text-danger' href='/delete_event/{event.id}' onclick='return confirm(\"Удалить это событие?\")'>Удалить</a></li>
                        </ul>
                      </div>''' if user_valid else ''
-                event_li += f'''
-                  <div style="position: relative;">
-                    <button type="button" class="btn btn-primary" style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {btn_color}" data-bs-toggle="modal" data-bs-target="#{id}">
-                      {ev_time} &quot;{ev_name}&quot; ({ev_type})
-                    </button>
-                    {btn_menu}
-                  </div>
-                  <div class="modal fade" id="{id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h3 class="modal-title">{ev_type} &quot;{ev_name}&quot;&nbsp;&nbsp;Время: {ev_time}</h3>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                if user_valid:
+                    event_li += f'''
+                      <div class="draggable-event" data-event-id="{event.id}" data-original-date="{date.date()}">
+                        <div style="position: relative;">
+                          <button type="button" draggable="true" class="btn btn-primary drag-btn" style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {btn_color}" data-bs-toggle="modal" data-bs-target="#{id}">
+                            {ev_time} &quot;{ev_name}&quot; ({ev_type})
+                          </button>
+                          {btn_menu}
                         </div>
-                        <div class="modal-body">
-                          <h5 style="color: red">Место проведения:</h5>
-                          <p style="color: #000">{ev_location}</p>
-                          {ev_utochneniya}
-                          <h5 style="color: red">Вызываются службы:</h5>
-                          <p>{ev_staff}</p>
-                
-                        </div>
-                        <div class="modal-footer d-flex justify-content-between">
-                          <div>{action_buttons}</div>
-                          <div>{button_tg1}{event.id if user_valid else ''}{button_tg2}</div>
+                        <div class="modal fade" id="{id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h3 class="modal-title">{ev_type} &quot;{ev_name}&quot;&nbsp;&nbsp;Время: {ev_time}</h3>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body">
+                                <h5 style="color: red">Место проведения:</h5>
+                                <p style="color: #000">{ev_location}</p>
+                                {ev_utochneniya}
+                                <h5 style="color: red">Вызываются службы:</h5>
+                                <p>{ev_staff}</p>
+                    
+                              </div>
+                              <div class="modal-footer d-flex justify-content-between">
+                                <div>{action_buttons}</div>
+                                <div>{button_tg1}{event.id if user_valid else ''}{button_tg2}</div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                '''
+                    '''
+                else:
+                    event_li += f'''
+                      <div style="position: relative;">
+                        <button type="button" class="btn btn-primary" style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {btn_color}" data-bs-toggle="modal" data-bs-target="#{id}">
+                          {ev_time} &quot;{ev_name}&quot; ({ev_type})
+                        </button>
+                      </div>
+                      <div class="modal fade" id="{id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h3 class="modal-title">{ev_type} &quot;{ev_name}&quot;&nbsp;&nbsp;Время: {ev_time}</h3>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <h5 style="color: red">Место проведения:</h5>
+                              <p style="color: #000">{ev_location}</p>
+                              {ev_utochneniya}
+                              <h5 style="color: red">Вызываются службы:</h5>
+                              <p>{ev_staff}</p>
+                    
+                            </div>
+                            <div class="modal-footer d-flex justify-content-between">
+                              <div>{action_buttons}</div>
+                              <div>{button_tg1}{event.id if user_valid else ''}{button_tg2}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    '''
 
         plus_button = f'<a href="/add_event/?date={date.date()}" class="btn btn-sm btn-primary" style="background-color: #624ba7; border-color: #a6a0c3;" title="Добавить событие">+</a>' if user_valid else ''
         result += f'''
-        <div class="col h-100 scroll-target" style="padding-top: 5rem" id="id_card_{i + 1}" data-date="{date.date()}">
+        <div class="col h-100 scroll-target" style="padding-top: 5rem" id="id_card_{i + 1}">
           <div class="card" style="height: 35rem">
             <div class="card-header d-flex justify-content-between align-items-center" style="font-size: 1rem; {today_color}">
               <span>{i + 1} {weekdays[date.weekday()]}</span>
               {plus_button}
             </div>
-            <div class="card-body">
+            <div class="card-body droppable-day" data-date="{date.date()}">
               <ul style="margin-right: 2rem">
                 {event_li}
               </ul>
@@ -132,7 +166,66 @@ def calendar(result='', user_valid=False, card_header_bg_color='', author=''):
           </div>
         </div>
         '''
-    return result
+    return result + '''
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let isCtrlOrCmdPressed = false;
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Control' || e.key === 'Meta') {
+          isCtrlOrCmdPressed = true;
+        }
+      });
+
+      document.addEventListener('keyup', (e) => {
+        if (e.key === 'Control' || e.key === 'Meta') {
+          isCtrlOrCmdPressed = false;
+        }
+      });
+
+      document.querySelectorAll('.drag-btn').forEach(btn => {
+        btn.addEventListener('dragstart', e => {
+          const parent = btn.closest('.draggable-event');
+          e.dataTransfer.setData('text/plain', parent.dataset.eventId);
+          e.dataTransfer.setData('original-date', parent.dataset.originalDate);
+          e.dataTransfer.setData('copy', isCtrlOrCmdPressed ? 'true' : 'false');
+        });
+      });
+
+      document.querySelectorAll('.droppable-day').forEach(day => {
+        day.addEventListener('dragover', e => e.preventDefault());
+        day.addEventListener('drop', async e => {
+          e.preventDefault();
+          const eventId = e.dataTransfer.getData('text/plain');
+          const newDate = day.dataset.date;
+
+          const isCopy = e.dataTransfer.getData('copy') === 'true';
+
+          const res = await fetch(`/update_event_date/${eventId}/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({date: newDate, copy: isCopy})
+          });
+
+          if (res.ok) {
+            location.reload();
+          } else {
+            alert('Ошибка при перемещении события');
+          }
+        });
+      });
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+    });
+  </script>
+  '''
 
 def calendar_switch_month(): #---------------------MONTS
     month_text = {1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь', 7: 'Июль', 8: 'Август',

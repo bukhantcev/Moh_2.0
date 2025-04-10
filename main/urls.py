@@ -16,6 +16,7 @@ urlpatterns = [
     path('event-location/new', views.create_event_location, name='create_event_location'),
     path('edit_event/<int:event_id>/', views.edit_event, name='edit_event'),
     path('delete_event/<int:event_id>/', views.delete_event, name='delete_event'),
+    path('update_event_date/<int:event_id>/', views.update_event_date, name='update_event_date'),
     path('event-type/', views.manage_event_types, name='manage_event_types'),
     path('event-type/edit/<int:pk>/', views.edit_event_type, name='edit_event_type'),
     path('event-type/delete/<int:pk>/', views.delete_event_type, name='delete_event_type'),
