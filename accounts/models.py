@@ -18,6 +18,8 @@ class Profile(models.Model):
     dolgnost =  models.ForeignKey(to='Dolgnost', verbose_name='Должность', on_delete=models.CASCADE, null=True)
     status = models.CharField(choices=Status.choices, default=Status.NO, max_length=50)
     sort_index = models.IntegerField(default=5, verbose_name='Индекс сортировки')
+    is_boss = models.BooleanField(default=False, verbose_name='Начальник')
+    is_bigboss = models.BooleanField(default=False, verbose_name='Завпост')
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

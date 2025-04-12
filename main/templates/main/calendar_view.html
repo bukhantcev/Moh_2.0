@@ -1,0 +1,60 @@
+{{ days_html|safe }}
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    let isCtrlOrCmdPressed = false;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Control' || e.key === 'Meta') {
+        isCtrlOrCmdPressed = true;
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'Control' || e.key === 'Meta') {
+        isCtrlOrCmdPressed = false;
+      }
+    });
+
+    document.querySelectorAll('.drag-btn').forEach(btn => {
+      btn.addEventListener('dragstart', e => {
+        const parent = btn.closest('.draggable-event');
+        e.dataTransfer.setData('text/plain', parent.dataset.eventId);
+        e.dataTransfer.setData('original-date', parent.dataset.originalDate);
+        e.dataTransfer.setData('copy', isCtrlOrCmdPressed ? 'true' : 'false');
+      });
+    });
+
+    document.querySelectorAll('.droppable-day').forEach(day => {
+      day.addEventListener('dragover', e => e.preventDefault());
+      day.addEventListener('drop', async e => {
+        e.preventDefault();
+        const eventId = e.dataTransfer.getData('text/plain');
+        const newDate = day.dataset.date;
+
+        const isCopy = e.dataTransfer.getData('copy') === 'true';
+
+        const res = await fetch(`/update_event_date/${eventId}/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+          },
+          body: JSON.stringify({date: newDate, copy: isCopy})
+        });
+
+        if (res.ok) {
+          location.reload();
+        } else {
+          alert('Ошибка при перемещении события');
+        }
+      });
+    });
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+  });
+</script>

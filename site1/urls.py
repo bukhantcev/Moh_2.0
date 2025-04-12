@@ -9,7 +9,8 @@ urlpatterns = [
     path('users', include('users.urls')),
     path('ajax/', include('ajax.urls')),
     path('users/', include('accounts.urls')),
-    path('room/', include('room.urls'))
+    path('room/', include('room.urls')),
+        path('department-events/', include('department_events.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # http: // 127.0.0.1: 8000 / accounts / login / длявхода,
@@ -17,4 +18,3 @@ urlpatterns = [
 # http: // 127.0.0.1: 8000 / accounts / password - change / длясменыпароля,
 # http: // 127.0.0.1: 8000 / accounts / password - reset / для сброс пароля.
 #http://127.0.0.1:8000/registration/
-

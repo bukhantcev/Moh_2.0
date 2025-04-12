@@ -1,0 +1,79 @@
+{% extends "main/layout.html" %}
+{% block main %}
+<div class="container mt-5 d-flex justify-content-center">
+  <div class="card shadow-lg" style="max-width: 700px; width: 100%;">
+    <div class="card-header text-center" style="background-color: #d6cef0;">
+      <h5 class="fw-bold mb-0">Добавить событие подразделения</h5>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <input type="datetime-local" class="form-control" name="date" value="{{ date }}">
+        </div>
+        <div class="mb-3">
+          <select class="form-select mb-3" name="type">
+            <option value="" disabled {% if not selected_type %}selected{% endif %}>Выберите тип...</option>
+            {% for t in types %}
+              <option value="{{ t.id }}" {% if t.id == selected_type %}selected{% endif %}>{{ t.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <select class="form-select mb-3" name="name">
+            <option value="" disabled {% if not selected_name %}selected{% endif %}>Выберите название...</option>
+            {% for n in names %}
+              <option value="{{ n.id }}" {% if n.id == selected_name %}selected{% endif %}>{{ n.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <select class="form-select mb-3" name="location">
+            <option value="" disabled {% if not selected_location %}selected{% endif %}>Выберите место...</option>
+            {% for l in locations %}
+              <option value="{{ l.id }}" {% if l.id == selected_location %}selected{% endif %}>{{ l.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <textarea class="form-control" name="description" rows="3" placeholder="Дополнительная информация...">{{ description }}</textarea>
+        </div>
+        <div class="mb-3 d-flex flex-wrap gap-3">
+          {% for user in users %}
+            <label class="form-check-label d-flex align-items-center gap-1">
+              <input class="form-check-input" type="checkbox" name="employees" value="{{ user.id }}"
+                     {% if user.id in selected_employees %}checked{% endif %}>
+              {{ user.last_name }} {{ user.first_name|slice:":1" }}.
+            </label>
+          {% endfor %}
+        </div>
+        <div class="text-center mt-4 d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-success px-4" disabled>💾 Сохранить</button>
+          <a href="/" class="btn btn-outline-secondary px-4">Отмена</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const typeSelect = document.querySelector('select[name="type"]');
+    const nameSelect = document.querySelector('select[name="name"]');
+    const locationSelect = document.querySelector('select[name="location"]');
+    const saveButton = document.querySelector('button[type="submit"]');
+
+    function toggleSaveButton() {
+      const isTypeSelected = typeSelect.value !== '';
+      const isNameSelected = nameSelect.value !== '';
+      const isLocationSelected = locationSelect.value !== '';
+      saveButton.disabled = !(isTypeSelected && isNameSelected && isLocationSelected);
+    }
+
+    typeSelect.addEventListener('change', toggleSaveButton);
+    nameSelect.addEventListener('change', toggleSaveButton);
+    locationSelect.addEventListener('change', toggleSaveButton);
+
+    toggleSaveButton(); // начальная проверка
+  });
+</script>
+{% endblock %}

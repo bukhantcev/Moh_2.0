@@ -10,6 +10,6 @@ admin.site.register(Dolgnost)
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ( 'user', 'first_name', 'last_name', 'phone', 'podrazdelenie', 'dolgnost', 'status', 'sort_index',)
-    list_editable = ('sort_index',)
+    list_display = ( 'user', 'first_name', 'last_name', 'phone', 'podrazdelenie', 'dolgnost', 'status', 'sort_index', 'is_boss', 'is_bigboss',)
+    list_editable = ('sort_index', 'is_boss', 'is_bigboss',)
     list_filter = ('dolgnost', 'podrazdelenie', 'sort_index',)

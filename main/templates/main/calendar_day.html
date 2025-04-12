@@ -1,0 +1,36 @@
+<div class="col h-100 scroll-target" style="padding-top: 5rem" id="id_card_{{ day_index }}">
+  <div class="card" style="height: 35rem">
+    <div class="card-header d-flex justify-content-between align-items-center" style="font-size: 1rem; {{ today_color }}">
+      <span>{{ day_index }} {{ weekday }}</span>
+      {% if show_menu %}
+        <div class="dropdown">
+          <button class="btn btn-link text-dark p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            {% if user.is_staff %}
+              <li>
+                <a class="dropdown-item" href="/add_event/?date={{ full_date }}">
+                  Создать событие
+                </a>
+              </li>
+            {% endif %}
+            <li>
+              <a class="dropdown-item" href="/department-events/create/?date={{ full_date }}">
+                Событие подразделения
+              </a>
+            </li>
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+    <div class="card-body droppable-day" data-date="{{ date }}">
+      <ul style="margin-right: 2rem">
+        {{ event_li|safe }}
+      </ul>
+      <ul style="margin-right: 2rem">
+        {{ department_li|safe }}
+      </ul>
+    </div>
+  </div>
+</div>

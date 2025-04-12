@@ -1,0 +1,34 @@
+<div style="position: relative;" {% if user_valid and not depart %}class="draggable-event" data-event-id="{{ event.id }}" data-original-date="{{ date }}"{% endif %}>
+  <button type="button"
+          {% if user_valid and not depart %}draggable="true" class="btn btn-primary drag-btn"{% else %}class="btn btn-primary"{% endif %}
+          style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {{ btn_color }}"
+          data-bs-toggle="modal"
+          data-bs-target="#event_id{{ event.id }}">
+    {{ ev_time }} &quot;{{ event.name }}&quot; ({{ event.type }})<br>{% if is_bigboss or is_super %}{{ event.department }}{% endif %}
+  </button>
+  {% if user_valid %}
+    {{ menu_html|safe }}
+  {% endif %}
+</div>
+
+<div class="modal fade" id="event_id{{ event.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ event.type }} &quot;{{ event.name }}&quot;&nbsp;&nbsp;Время: {{ ev_time }}</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h5 style="color: red">Место проведения:</h5>
+        <p style="color: #000">{{ event.location }}</p>
+        {{ ev_utochneniya|safe }}
+        <h5 style="color: red">Вызов:</h5>
+        <p>{{ ev_staff|safe }}</p>
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <div>{{ action_buttons|safe }}</div>
+        <div>{{ button_tg_html|safe }}</div>
+      </div>
+    </div>
+  </div>
+</div>

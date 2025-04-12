@@ -1,0 +1,11 @@
+<div class='dropdown' style='position: absolute; top: 8px; right: 1px; z-index: 10;'>
+  <button class='btn btn-sm' type='button' data-bs-toggle='dropdown' aria-expanded='false'
+          style='color: red; background: none; border: none; padding: 0; font-size: 1.4rem; transform: translateY(4px);'>
+    <i class='bi bi-three-dots-vertical'></i>
+  </button>
+  <ul class='dropdown-menu'>
+    <li><a class='dropdown-item' href='/add_event/?copy_id={{ event.id }}'>Копировать</a></li>
+    <li><a class='dropdown-item' href='/edit_event/{{ event.id }}'>Редактировать</a></li>
+    <li><a class='dropdown-item text-danger' href='/delete_event/{{ event.id }}' onclick='return confirm("Удалить это событие?")'>Удалить</a></li>
+  </ul>
+</div>

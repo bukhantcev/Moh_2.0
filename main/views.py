@@ -2,15 +2,14 @@ from django import forms
 import datetime
 import os
 import shutil
-from cProfile import label
-from lib2to3.fixes.fix_input import context
-from lib2to3.pgen2.tokenize import group
+
 
 from dateutil.utils import today
 from django.contrib.auth.models import User, Group
 from django.http import FileResponse, HttpResponse
 from django.shortcuts import render, redirect
-from .models import calendar, calendar_switch_month, my_calendar, calendar_switch_year, autoscroll, Spect
+from .calendar import calendar, calendar_switch_month, my_calendar, calendar_switch_year, autoscroll
+from .models import Spect
 from forms.models import Event_name, Event, Event_type, Event_location
 
 from telegram.telegram_base import send_telegram_message
@@ -91,10 +90,6 @@ def index(request):       #-------------MAIN
 
 
 
-    try:
-        author = f"{request.user.first_name} {request.user.last_name}"
-    except:
-        author = request.user.username
     if 'text_message' in request.GET:
         if request.user.is_staff:
             send_telegram_message(request.GET.get('text_message'), author=author)
@@ -126,7 +121,7 @@ def index(request):       #-------------MAIN
                 card_bg_color = ''#------TODAY
 
 
-        return render(request, 'main/index.html', context={'cal':calendar(result='', user_valid=request.user.is_staff,card_header_bg_color=card_bg_color, author=author), 'current_month': my_calendar.month_text[my_calendar.current_month], 'btn_month': calendar_switch_month(), 'current_year': calendar_switch_year()['current_year'], 'next_year': calendar_switch_year()['next_year'], 'real_year': calendar_switch_year()['real_year'], 'today': today, 'year_title': my_calendar.year_title, 'ammount_user': ammount_user})
+        return render(request, 'main/index.html', context={'cal':calendar(result='', user_valid=request.user.is_staff, card_header_bg_color=card_bg_color, user=request.user), 'current_month': my_calendar.month_text[my_calendar.current_month], 'btn_month': calendar_switch_month(), 'current_year': calendar_switch_year()['current_year'], 'next_year': calendar_switch_year()['next_year'], 'real_year': calendar_switch_year()['real_year'], 'today': today, 'year_title': my_calendar.year_title, 'ammount_user': ammount_user, 'profile': request.user.profile})
     else:
         return redirect('login')
 
