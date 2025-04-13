@@ -12,12 +12,16 @@ from .calendar import calendar, calendar_switch_month, my_calendar, calendar_swi
 from .models import Spect
 from forms.models import Event_name, Event, Event_type, Event_location
 
-from telegram.telegram_base import send_telegram_message
+from telegram.telegram_base import send_telegram_message, send_telegram_message_dep
 from forms.parser import create_event
 import wget
 from django.forms.models import model_to_dict
 from .forms import SpectForm
 from accounts.models import Profile, Podrazdelenie, Dolgnost
+from dotenv import load_dotenv
+load_dotenv()
+print("BOT_TOKEN:", os.getenv("BOT_TOKEN"))
+print("BOT_TOKEN_LIGHT:", os.getenv("BOT_TOKEN_LIGHT"))
 
 
 
@@ -91,9 +95,29 @@ def index(request):       #-------------MAIN
 
 
     if 'text_message' in request.GET:
-        if request.user.is_staff:
-            send_telegram_message(request.GET.get('text_message'), author=author)
-            return(redirect('/'))
+        if request.user.profile.is_pomreg:
+            chat_id = os.getenv('CHAT_ID_ALL')
+        else:
+            chat_id = ''
+        BOT_TOKEN = os.getenv("BOT_TOKEN_LIGHT") if request.user.profile.podrazdelenie.name == 'Свет' else os.getenv("BOT_TOKEN")
+        thread_id = os.getenv('THREAD_ID_ALL') if request.user.profile.is_pomreg else ''
+        print(chat_id)
+        if request.user.profile.is_pomreg:
+            send_telegram_message(request.GET.get('text_message'), author=f"{request.user.first_name} {request.user.last_name}", chat_id=chat_id, bot_token=BOT_TOKEN, thread_id=thread_id )
+            return redirect('/')
+    if 'tgmessagedep' in request.GET:
+        print('jjhc')
+        if request.user.profile.is_boss:
+            chat_id = os.getenv(f'CHAT_ID_{request.user.profile.podrazdelenie.name.lower()}')
+        else:
+            chat_id = ''
+        BOT_TOKEN = os.getenv("BOT_TOKEN_LIGHT") if request.user.profile.podrazdelenie.name == 'Свет' else os.getenv("BOT_TOKEN")
+        thread_id = ''
+        print(chat_id)
+        if request.user.profile.is_boss:
+            send_telegram_message_dep(request.GET.get('tgmessagedep'), author=f"{request.user.first_name} {request.user.last_name}", chat_id=chat_id, bot_token=BOT_TOKEN, thread_id=thread_id )
+            return redirect('/')
+
     if 'month' in request.GET:
         setattr(my_calendar, 'current_month', int(request.GET.get('month')))
     if 'year' in request.GET:
@@ -120,8 +144,24 @@ def index(request):       #-------------MAIN
                 today = '#main'
                 card_bg_color = ''#------TODAY
 
+        context = {
+            'cal': calendar(result='', user_valid=request.user.profile.is_pomreg, card_header_bg_color=card_bg_color,
+                            user=request.user),
+            'current_month': my_calendar.month_text[my_calendar.current_month],
+            'btn_month': calendar_switch_month(),
+            'current_year': calendar_switch_year()['current_year'],
+            'next_year': calendar_switch_year()['next_year'],
+            'real_year': calendar_switch_year()['real_year'],
+            'today': today, 'year_title': my_calendar.year_title,
+            'ammount_user': ammount_user,
+            'profile': request.user.profile,
+            'is_boss': hasattr(request.user, 'profile') and request.user.profile.is_boss,
+            'is_bigboss': hasattr(request.user, 'profile') and request.user.profile.is_bigboss,
+            'is_pomreg': hasattr(request.user, 'profile') and request.user.profile.is_pomreg,
+        }
 
-        return render(request, 'main/index.html', context={'cal':calendar(result='', user_valid=request.user.is_staff, card_header_bg_color=card_bg_color, user=request.user), 'current_month': my_calendar.month_text[my_calendar.current_month], 'btn_month': calendar_switch_month(), 'current_year': calendar_switch_year()['current_year'], 'next_year': calendar_switch_year()['next_year'], 'real_year': calendar_switch_year()['real_year'], 'today': today, 'year_title': my_calendar.year_title, 'ammount_user': ammount_user, 'profile': request.user.profile})
+
+        return render(request, 'main/index.html', context=context )
     else:
         return redirect('login')
 

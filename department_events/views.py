@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from .models import DepartmentEvent, DepartmentEventType, DepartmentEventName, DepartmentEventLocation
 from accounts.models import Profile
 from .forms import DepartmentEventForm
@@ -8,6 +9,7 @@ import datetime
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import reverse
 
 class EventTypeForm(forms.ModelForm):
     class Meta:
@@ -21,7 +23,7 @@ class EventNameForm(forms.ModelForm):
 
 @login_required
 def create_department_event(request):
-    if request.user.profile.dolgnost.name != "Начальник подразделения":
+    if not request.user.profile.is_boss:
         return redirect('/')
 
     if request.method == 'POST':
@@ -176,14 +178,16 @@ def add_name(request):
 
 @csrf_exempt
 def add_location(request):
-    print('ok')
+    print('[add_location] POST request received')
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            print('[add_location] Data received:', data)
             obj = DepartmentEventLocation.objects.create(
                 name=data['name'],
                 department=request.user.profile.podrazdelenie
             )
+            print('[add_location] Created location:', obj)
             return JsonResponse({'id': obj.id, 'name': obj.name})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
@@ -253,19 +257,35 @@ def edit_dep_event_location(request, pk):
 @login_required
 def delete_dep_event_location(request, pk):
     instance = get_object_or_404(DepartmentEventLocation, pk=pk, department=request.user.profile.podrazdelenie)
+
+    # Проверка: используется ли локация в событиях
+    if DepartmentEvent.objects.filter(location=instance).exists():
+        messages.warning(request, "Нельзя удалить локацию — она используется в событиях.")
+        return redirect('manage_dep_event_locations')
+
     instance.delete()
+    messages.success(request, "Локация удалена.")
+    next_url = request.GET.get('next')
+    if next_url:
+        return redirect(f"{reverse('manage_dep_event_locations')}?next={next_url}")
     return redirect('manage_dep_event_locations')
 
 @login_required
 def delete_dep_event_name(request, pk):
     instance = get_object_or_404(DepartmentEventName, pk=pk, department=request.user.profile.podrazdelenie)
     instance.delete()
+    next_url = request.GET.get('next')
+    if next_url:
+        return redirect(f"{reverse('manage_dep_event_names')}?next={next_url}")
     return redirect('manage_dep_event_names')
 
 @login_required
 def delete_dep_event_type(request, pk):
     instance = get_object_or_404(DepartmentEventType, pk=pk, department=request.user.profile.podrazdelenie)
     instance.delete()
+    next_url = request.GET.get('next')
+    if next_url:
+        return redirect(f"{reverse('manage_dep_event_types')}?next={next_url}")
     return redirect('manage_dep_event_types')
 
 @login_required

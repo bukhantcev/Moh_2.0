@@ -27,18 +27,20 @@
           <a href="/spects"><button type="button" class="btn btn-custom btn-custom-header btn-custom-header-side">Спектакли</button></a>
         </li>
 
-        {% if request.user.is_staff %}
+        {% if request.user.profile.is_pomreg %}
         <li class="nav-item dropdown">
           <a href="#" id="navbarDropdownMenuLink1"
             data-bs-toggle="dropdown" aria-expanded="false">
             <button type="button" class="btn btn-custom btn-custom-header btn-custom-header-side">Инструменты</button>
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink1" style="min-width: 12rem;">
+            {% if request.user.is_staff %}
             <li><a class="nav-link active" aria-current="page" onclick="AdminRedirect();" href="#"
                   target="_top"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas" aria-label="Close">Админ-страница</button></a></li>
             <li><a class="nav-link active" aria-current="page" href="?command=go_parsing"
                 target="_top"><button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas"
                 aria-label="Close">Расписание с сайта</button></a></li>
+            {% endif %}
             <li><a class="nav-link active" aria-current="page" href="{% url 'manage_event_types' %}" target="_top">
               <button type="button" class="btn btn-custom" data-bs-dismiss="offcanvas" aria-label="Close">Типы мероприятий</button>
             </a></li>

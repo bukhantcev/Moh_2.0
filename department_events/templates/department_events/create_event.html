@@ -12,28 +12,46 @@
           <input type="datetime-local" class="form-control" name="date" value="{{ date }}">
         </div>
         <div class="mb-3">
-          <select class="form-select mb-3" name="type">
-            <option value="" disabled {% if not selected_type %}selected{% endif %}>Выберите тип...</option>
-            {% for t in types %}
-              <option value="{{ t.id }}" {% if t.id == selected_type %}selected{% endif %}>{{ t.name }}</option>
-            {% endfor %}
-          </select>
+          <label class="form-label">Тип</label>
+          <div class="d-flex align-items-center gap-2">
+            <select name="type" class="form-select flex-grow-1" id="select-type">
+              <option value="" disabled {% if not selected_type %}selected{% endif %}>Выберите тип...</option>
+              {% for t in types %}
+                <option value="{{ t.id }}" {% if t.id == selected_type %}selected{% endif %}>{{ t.name }}</option>
+              {% endfor %}
+            </select>
+            <input type="text" class="form-control d-none" id="input-type" placeholder="Добавить новый тип...">
+            <button type="button" class="btn btn-outline-primary" id="btn-type" onclick="toggleAddMode('type')">+</button>
+            <a href="{% url 'manage_dep_event_types' %}?next={{ request.get_full_path }}" class="btn btn-outline-secondary" title="Показать все типы">👁</a>
+          </div>
         </div>
         <div class="mb-3">
-          <select class="form-select mb-3" name="name">
-            <option value="" disabled {% if not selected_name %}selected{% endif %}>Выберите название...</option>
-            {% for n in names %}
-              <option value="{{ n.id }}" {% if n.id == selected_name %}selected{% endif %}>{{ n.name }}</option>
-            {% endfor %}
-          </select>
+          <label class="form-label">Название</label>
+          <div class="d-flex align-items-center gap-2">
+            <select name="name" class="form-select flex-grow-1" id="select-name">
+              <option value="" disabled {% if not selected_name %}selected{% endif %}>Выберите название...</option>
+              {% for n in names %}
+                <option value="{{ n.id }}" {% if n.id == selected_name %}selected{% endif %}>{{ n.name }}</option>
+              {% endfor %}
+            </select>
+            <input type="text" class="form-control d-none" id="input-name" placeholder="Добавить новое название...">
+            <button type="button" class="btn btn-outline-primary" id="btn-name" onclick="toggleAddMode('name')">+</button>
+            <a href="{% url 'manage_dep_event_names' %}?next={{ request.get_full_path }}" class="btn btn-outline-secondary" title="Показать все названия">👁</a>
+          </div>
         </div>
         <div class="mb-3">
-          <select class="form-select mb-3" name="location">
-            <option value="" disabled {% if not selected_location %}selected{% endif %}>Выберите место...</option>
-            {% for l in locations %}
-              <option value="{{ l.id }}" {% if l.id == selected_location %}selected{% endif %}>{{ l.name }}</option>
-            {% endfor %}
-          </select>
+          <label class="form-label">Место</label>
+          <div class="d-flex align-items-center gap-2">
+            <select name="location" class="form-select flex-grow-1" id="select-location">
+              <option value="" disabled {% if not selected_location %}selected{% endif %}>Выберите место...</option>
+              {% for l in locations %}
+                <option value="{{ l.id }}" {% if l.id == selected_location %}selected{% endif %}>{{ l.name }}</option>
+              {% endfor %}
+            </select>
+            <input type="text" class="form-control d-none" id="input-location" placeholder="Добавить новое место...">
+            <button type="button" class="btn btn-outline-primary" id="btn-location" onclick="toggleAddMode('location')">+</button>
+            <a href="{% url 'manage_dep_event_locations' %}?next={{ request.get_full_path }}" class="btn btn-outline-secondary" title="Показать все места">👁</a>
+          </div>
         </div>
         <div class="mb-3">
           <textarea class="form-control" name="description" rows="3" placeholder="Дополнительная информация...">{{ description }}</textarea>
@@ -49,7 +67,7 @@
         </div>
         <div class="text-center mt-4 d-flex justify-content-center gap-3">
           <button type="submit" class="btn btn-success px-4" disabled>💾 Сохранить</button>
-          <a href="/" class="btn btn-outline-secondary px-4">Отмена</a>
+          <a href="{{ request.GET.next|default:'/' }}" class="btn btn-outline-secondary px-4">Отмена</a>
         </div>
       </form>
     </div>
@@ -75,5 +93,74 @@
 
     toggleSaveButton(); // начальная проверка
   });
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Check if this cookie string begins with the given name
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function toggleSaveButton() {
+    const typeSelect = document.querySelector('select[name="type"]');
+    const nameSelect = document.querySelector('select[name="name"]');
+    const locationSelect = document.querySelector('select[name="location"]');
+    const saveButton = document.querySelector('button[type="submit"]');
+
+    const isTypeSelected = typeSelect.value !== '';
+    const isNameSelected = nameSelect.value !== '';
+    const isLocationSelected = locationSelect.value !== '';
+    saveButton.disabled = !(isTypeSelected && isNameSelected && isLocationSelected);
+  }
+
+  function toggleAddMode(field) {
+    const select = document.getElementById('select-' + field);
+    const input = document.getElementById('input-' + field);
+    const button = document.getElementById('btn-' + field);
+
+    const isAdding = !input.classList.contains('d-none');
+
+    if (isAdding) {
+      const value = input.value.trim();
+      if (!value) return;
+
+      const nextParam = new URLSearchParams(window.location.search).get('next');
+      const postUrl = `/department-events/add_${field}/` + (nextParam ? `?next=${encodeURIComponent(nextParam)}` : '');
+      fetch(postUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({ name: value })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.id && data.name) {
+          const option = new Option(data.name, data.id, true, true);
+          select.add(option);
+          select.value = data.id;
+          toggleSaveButton();
+        }
+        input.classList.add('d-none');
+        select.classList.remove('d-none');
+        button.textContent = '+';
+      });
+    } else {
+      input.classList.remove('d-none');
+      select.classList.add('d-none');
+      input.focus();
+      button.textContent = 'Сохранить';
+    }
+  }
 </script>
 {% endblock %}

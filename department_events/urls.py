@@ -14,6 +14,7 @@ urlpatterns = [
     path('update_dep_event_date/<int:event_id>/', update_dep_event_date, name='update_event_date'),
     path('add_type/', add_type, name='add_type'),
     path('add_name/', add_name, name='add_name'),
+    # AJAX endpoint to add location from JS (POST only)
     path('add_location/', add_location, name='add_location'),
     path('manage_dep_event_types/', manage_dep_event_types, name='manage_dep_event_types'),
     path('manage_dep_event_names/', manage_dep_event_names, name='manage_dep_event_names'),

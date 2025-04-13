@@ -20,6 +20,7 @@ class Profile(models.Model):
     sort_index = models.IntegerField(default=5, verbose_name='Индекс сортировки')
     is_boss = models.BooleanField(default=False, verbose_name='Начальник')
     is_bigboss = models.BooleanField(default=False, verbose_name='Завпост')
+    is_pomreg = models.BooleanField(default=False, verbose_name='Помреж')
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

@@ -68,11 +68,12 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
                     'ev_utochneniya': ev_utochneniya,
                     'ev_staff': ev_staff,
                     'action_buttons': render_to_string('department_events/dep_actions.html', {'event': dep_event}) if hasattr(user, 'profile') and user.profile.is_boss else '',
-                    # 'button_tg_html': f'<a href="?text_message={dep_event.id}" class="btn btn-info btn-sm">Отправить в телегу</a>',
-                    'button_tg_html': '',
+                    'button_tg_html': f'<a href="?tgmessagedep={dep_event.id}" class="btn btn-info btn-sm">Отправить в телегу</a>' if hasattr(user, 'profile') and user.profile.is_boss else '' ,
+                    # 'button_tg_html': '',
                     'is_bigboss': hasattr(user, 'profile') and user.profile.is_bigboss,
                     'is_boss': hasattr(user, 'profile') and user.profile.is_boss,
                     'is_super': user.is_superuser,
+                    'is_pomreg': hasattr(user, 'profile') and user.profile.is_pomreg,
                     'depart': True,
                 })
 
@@ -116,7 +117,9 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
                     'ev_staff': ev_staff,
                     'action_buttons': render_to_string('main/event_actions.html', {'event': event}) if user_valid else '',
                     'button_tg_html': button_tg_html,
+                    'is_boss': hasattr(user, 'profile') and user.profile.is_boss,
                     'is_bigboss': hasattr(user, 'profile') and user.profile.is_bigboss,
+                    'is_pomreg': hasattr(user, 'profile') and user.profile.is_pomreg,
                     'depart': False,
                     'is_super': user.is_superuser,
                 })
@@ -133,6 +136,9 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
             'profile': user.profile,
             'show_menu': user_valid or (hasattr(user, 'profile') and (user.profile.is_boss or user.is_superuser)),
             'user': user,
+            'is_boss': hasattr(user, 'profile') and user.profile.is_boss,
+            'is_bigboss': hasattr(user, 'profile') and user.profile.is_bigboss,
+            'is_pomreg': hasattr(user, 'profile') and user.profile.is_pomreg,
         })
         result += day_html
     return render_to_string('main/calendar_view.html', {'days_html': result})

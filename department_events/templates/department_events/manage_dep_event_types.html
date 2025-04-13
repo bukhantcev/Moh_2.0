@@ -4,7 +4,7 @@
   <h3>Типы событий</h3>
   <div class="mb-3 d-flex gap-2">
     <a href="{% url 'create_dep_event_type' %}" class="btn btn-success">Добавить новый тип</a>
-    <a href="{% url 'home' %}" class="btn btn-secondary">На главную</a>
+    <a href="{{ request.GET.next|default:'/' }}" class="btn btn-secondary">Назад</a>
   </div>
   <table class="table table-bordered table-hover mt-3">
     <thead class="table-light">

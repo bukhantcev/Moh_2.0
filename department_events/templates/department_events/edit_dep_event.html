@@ -50,7 +50,7 @@
               </select>
               <input type="text" class="form-control d-none" id="input-type" placeholder="Добавить новое...">
               <button type="button" class="btn btn-outline-primary" id="btn-type" onclick="toggleAddMode('type')">+</button>
-              <a href="{% url 'manage_dep_event_types' %}" class="btn btn-outline-secondary" title="Показать все типы">👁</a>
+              <a href="{% url 'manage_dep_event_types' %}?next={{ request.get_full_path }}" class="btn btn-outline-secondary" title="Показать все типы">👁</a>
             </div>
           </div>
 
@@ -64,7 +64,7 @@
               </select>
               <input type="text" class="form-control d-none" id="input-name" placeholder="Добавить новое...">
               <button type="button" class="btn btn-outline-primary" id="btn-name" onclick="toggleAddMode('name')">+</button>
-              <a href="{% url 'manage_dep_event_names' %}" class="btn btn-outline-secondary" title="Показать все названия">👁</a>
+              <a href="{% url 'manage_dep_event_names' %}?next={{ request.get_full_path }}" class="btn btn-outline-secondary" title="Показать все названия">👁</a>
             </div>
           </div>
 
@@ -78,7 +78,7 @@
               </select>
               <input type="text" class="form-control d-none" id="input-location" placeholder="Добавить новое...">
               <button type="button" class="btn btn-outline-primary" id="btn-location" onclick="toggleAddMode('location')">+</button>
-              <a href="{% url 'manage_dep_event_locations' %}" class="btn btn-outline-secondary" title="Показать все места">👁</a>
+              <a href="{% url 'manage_dep_event_locations' %}?next={{ request.get_full_path }}" class="btn btn-outline-secondary" title="Показать все места">👁</a>
             </div>
           </div>
 

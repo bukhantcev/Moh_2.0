@@ -8,18 +8,20 @@
             <i class="bi bi-three-dots-vertical"></i>
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
-            {% if user.is_staff %}
+            {% if is_pomreg %}
               <li>
                 <a class="dropdown-item" href="/add_event/?date={{ full_date }}">
                   Создать событие
                 </a>
               </li>
             {% endif %}
+            {% if is_boss %}
             <li>
               <a class="dropdown-item" href="/department-events/create/?date={{ full_date }}">
                 Событие подразделения
               </a>
             </li>
+            {% endif %}
           </ul>
         </div>
       {% endif %}
