@@ -2,34 +2,231 @@
 
 {% block title %} Личный кабинет {% endblock %}
 
-
-
-
-
 {% block main %}
-<div class="container-fluid h-100 d-flex justify-content-center" style="margin-top: 15rem;">
-        <div class="row">
-            <div class="col">
-                <h3 style="text-align: center;">{{ request.user }}, добро пожаловать в личный кабинет!</h3>
-            </div>
-        {% if request.user.is_staff %}
-        <div class="row">
-            <div class="col">
-                {% if users|length > 0 %}
-
-                <h1 style="margin: 0 3rem 0 3rem; text-align: center;">
-                    Ожидают подтверждения:
-                </h1><br>
+<div class="container-fluid" style="margin-top: 6rem;">
+    <div class="row">
+        <!-- Левая колонка: Информация о пользователе -->
+        <div class="col-md-8">
+            <h3>{{ request.user }}, добро пожаловать в личный кабинет!</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Имя</label>
+                    <input type="text" class="form-control" name="first_name" value="{{ request.user.first_name }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Фамилия</label>
+                    <input type="text" class="form-control" name="last_name" value="{{ request.user.last_name }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Телефон</label>
+                    <input type="text" class="form-control" name="phone" value="{{ request.user.profile.phone }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Подразделение</label>
+                    <select class="form-select" name="podrazdelenie">
+                        {% for p in podrazdelenie_list %}
+                            <option value="{{ p.id }}" {% if request.user.profile.podrazdelenie and request.user.profile.podrazdelenie.id == p.id %}selected{% endif %}>{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Должность</label>
+                    <select class="form-select" name="dolgnost">
+                        {% for d in dolgnost_list %}
+                            <option value="{{ d.id }}" {% if request.user.profile.dolgnost and request.user.profile.dolgnost.id == d.id %}selected{% endif %}>{{ d }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success" id="submitBtn" disabled>Сохранить изменения</button>
+                <button type="button" class="btn btn-secondary ms-2" id="togglePasswordBtn">Изменить пароль</button>
+                {% if messages %}
+                    <div class="mt-3">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
                 {% endif %}
+                <div class="collapse mt-3" id="changePassword">
+                    <div class="card card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Старый пароль</label>
+                            <input type="password" class="form-control" name="old_password">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Новый пароль</label>
+                            <input type="password" class="form-control" name="new_password1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Повторите новый пароль</label>
+                            <input type="password" class="form-control" name="new_password2">
+                        </div>
+                    </div>
+                </div>
+                {% if request.user.username == 'bukhantcev' %}
+                    <div id="easterCat" style="position:absolute; top:200px; left:200px; cursor:pointer; z-index:9999; font-size: 5rem; animation: bounce 1s infinite; pointer-events: auto; background: transparent;">
+                        🐱
+                    </div>
+                    <style>
+                    @keyframes bounce {
+                        0%, 100% {
+                            transform: translateY(0);
+                        }
+                        50% {
+                            transform: translateY(-10px);
+                        }
+                    }
 
+                    @keyframes pop {
+                        0% { transform: scale(0.5); opacity: 0; }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                    </style>
+                    <div id="easterHeart" style="visibility:hidden; opacity:0; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999; display:flex; align-items:center; justify-content:center; font-size:10vw; color:red; font-weight:bold; transition: opacity 0.5s ease;">
+                        ❤️ LOVE YOU!
+                    </div>
+                {% endif %}
+            </form>
+        </div>
 
-                {% for user in users %}
-                <a href="form_valid?user_id={{user.id}}"><h3 style="text-align: center;">{{user}}</h3></a>
-                {% endfor %}
-            
+        <!-- Правая колонка: Sidebar -->
+        {% if request.user.is_staff %}
+        <div class="col-md-4">
+            {% if users|length > 0 %}
+            <h4 class="text-center">Ожидают подтверждения:</h4>
+            <hr>
+            {% for user in users %}
+            <div class="text-center mb-2">
+                <a href="form_valid?user_id={{user.id}}"><h6>{{user}}</h6></a>
             </div>
+            {% endfor %}
+            {% endif %}
         </div>
         {% endif %}
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById("togglePasswordBtn");
+        const changePasswordDiv = document.getElementById("changePassword");
+        const form = document.querySelector("form");
+
+        toggleBtn.addEventListener("click", function () {
+            if (!changePasswordDiv.classList.contains("show")) {
+                // Показать поля
+                new bootstrap.Collapse(changePasswordDiv, { toggle: true });
+                toggleBtn.textContent = "Сохранить пароль";
+            } else {
+                // Отправить форму
+                form.submit();
+            }
+        });
+
+        {% if request.user.username == 'bukhantcev' %}
+        const phoneInput = form.querySelector('input[name="phone"]');
+        const originalPhone = phoneInput.value;
+
+        phoneInput.addEventListener("input", () => {
+            if (phoneInput.value === "+79265730771") {
+                setTimeout(() => {
+                    phoneInput.value = originalPhone;
+                    const cat = document.getElementById("easterCat");
+                    if (cat) cat.style.display = 'block';
+
+                    // сбросить кнопку "Сохранить" если была активна
+                    const submitBtn = document.getElementById("submitBtn");
+                    if (submitBtn) submitBtn.disabled = true;
+                }, 100);
+            }
+        });
+        {% endif %}
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+            document.querySelectorAll(".alert").forEach(el => {
+                el.classList.add("fade");
+                el.classList.add("show");
+                el.style.transition = "opacity 0.5s ease";
+                el.style.opacity = "0";
+                setTimeout(() => el.remove(), 500);
+            });
+        }, 5000);
+
+        const form = document.querySelector("form");
+        const submitBtn = document.getElementById("submitBtn");
+        const originalData = new FormData(form);
+
+        form.addEventListener("input", () => {
+            const currentData = new FormData(form);
+            let changed = false;
+
+            for (let [key, value] of currentData.entries()) {
+                if (originalData.get(key) !== value) {
+                    changed = true;
+                    break;
+                }
+            }
+
+            submitBtn.disabled = !changed;
+        });
+
+        const cat = document.getElementById("easterCat");
+        const heart = document.getElementById("easterHeart");
+        if (cat) {
+            let clickCount = 0;
+            const positions = [
+                {top: '100px', left: '100px'},
+                {top: '200px', left: '400px'},
+                {top: '350px', left: '150px'},
+                {top: '500px', left: '500px'}
+            ];
+
+            cat.addEventListener("click", () => {
+                if (clickCount < positions.length) {
+                    cat.style.transition = "all 0.4s ease";
+                    cat.style.top = positions[clickCount].top;
+                    cat.style.left = positions[clickCount].left;
+                    cat.style.transform = `rotate(${(clickCount % 2 === 0 ? 15 : -15)}deg)`;
+                    clickCount++;
+
+                    if (clickCount === positions.length) {
+                        setTimeout(() => {
+                            cat.remove();
+                            heart.style.visibility = 'visible';
+                            heart.style.opacity = '1';
+                            setTimeout(() => {
+                                heart.style.opacity = '0';
+                                heart.style.visibility = 'hidden';
+                            }, 3000);
+                        }, 400);
+                    }
+                }
+            });
+        }
+
+        const logoArea = document.getElementById("logoArea");
+        let hoverCount = 0;
+        let hoverState = false;
+
+        if (logoArea && cat) {
+            cat.style.display = 'none';
+
+            logoArea.addEventListener("mouseover", () => {
+                if (!hoverState) {
+                    hoverState = true;
+                    hoverCount++;
+                    if (hoverCount >= 10) {
+                        cat.style.display = 'block';
+                    }
+                }
+            });
+
+            logoArea.addEventListener("mouseout", () => {
+                hoverState = false;
+            });
+        }
+    });
+</script>
 {% endblock %}
