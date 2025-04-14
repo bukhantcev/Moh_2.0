@@ -1,10 +1,11 @@
+{% load my_filters %}
 <div style="position: relative;" {% if user_valid and not depart %}class="draggable-event" data-event-id="{{ event.id }}" data-original-date="{{ date }}"{% endif %}>
   <button type="button"
           {% if user_valid and not depart %}draggable="true" class="btn btn-primary drag-btn"{% else %}class="btn btn-primary"{% endif %}
           style="font-size: 0.8rem; margin-bottom: 0.1rem; width: 100%; {{ btn_color }}"
           data-bs-toggle="modal"
           data-bs-target="#event_id{{ event.id }}">
-    {{ ev_time }} &quot;{{ event.name }}&quot; ({{ event.type }})<br>{% if is_bigboss or is_super %}{{ event.department }}{% endif %}
+    {{ ev_time }} &quot;{{ event.name }}&quot; ({{ event.type }})<br>{{ event.department }}
   </button>
   {% if user_valid %}
     {{ menu_html|safe }}
@@ -23,7 +24,52 @@
         <p style="color: #000">{{ event.location }}</p>
         {{ ev_utochneniya|safe }}
         <h5 style="color: red">Вызов:</h5>
-        <p>{{ ev_staff|safe }}</p>
+        {% if depart %}
+            <p style="color: #4b0082; text-decoration: underline; font-weight: bold;">{{ ev_staff|safe }}</p>
+              {% else %}
+        {% for label in ev_staff_lines %}
+          {% with staff_list=staff_by_group|get_item:label %}
+          <div>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#staffModal{{ event.id }}{{ label }}"
+               style="color: #4b0082; text-decoration: underline; font-weight: bold;">
+                {{ label }}
+            </a>
+          </div>
+
+          <div class="modal fade" id="staffModal{{ event.id }}{{ label }}" tabindex="-1" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+            <div class="modal-dialog modal-dialog-scrollable">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Сотрудники подразделения: {{ label }}</h5>
+                </div>
+                <div class="modal-body">
+                  {% if staff_list %}
+                    <ul class="list-group">
+                      {% for profile in staff_list %}
+                        <li class="list-group-item">
+                          <a href="tel:{{ profile.phone }}" style="color: #4b0082; text-decoration: underline; font-weight: bold;">{{ profile.last_name }} {{ profile.first_name }}</a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p>Нет назначенных сотрудников</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endwith %}
+        {% endfor %}
+        {% endif %}
+        {% if is_boss and event_li %}
+          <div class="mt-2">
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#assignStaffModal{{ event.id }}">
+              Назначить сотрудников
+            </button>
+          </div>
+        {% endif %}
       </div>
       <div class="modal-footer d-flex justify-content-between">
         <div>{{ action_buttons|safe }}</div>
@@ -32,3 +78,34 @@
     </div>
   </div>
 </div>
+
+{% if is_boss and event_li %}
+<div class="modal fade" id="assignStaffModal{{ event.id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Назначить сотрудников</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{% url 'assign_event_staff' event.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          {% for profile in staff_in_department %}
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="staff_ids" value="{{ profile.id }}"
+                     id="profile{{ profile.id }}"
+                     {% if profile in event.staff.all %}checked{% endif %}>
+              <label class="form-check-label" for="profile{{ profile.id }}">
+                {{ profile.last_name }} {{ profile.first_name }}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}

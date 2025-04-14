@@ -15,7 +15,7 @@
                 </a>
               </li>
             {% endif %}
-            {% if is_boss %}
+            {% if is_boss or is_bigboss %}
             <li>
               <a class="dropdown-item" href="/department-events/create/?date={{ full_date }}">
                 Событие подразделения

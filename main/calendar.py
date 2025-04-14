@@ -3,6 +3,8 @@ from calendar import monthrange
 from forms.models import Event, Event_type
 from department_events.models import DepartmentEvent, DepartmentEventType
 from django.template.loader import render_to_string
+from django.template.context_processors import csrf
+from accounts.models import Profile
 
 #----------------------------------------CALENDAR
 month_text = {1: 'Январь', 2: 'Февраль', 3: 'Март', 4: 'Апрель', 5: 'Май', 6: 'Июнь', 7: 'Июль', 8: 'Август',
@@ -25,7 +27,7 @@ class Calendar:
 my_calendar = Calendar
 
 
-def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
+def calendar(request, result='', user_valid=False, card_header_bg_color='', user=None):
     current_year = my_calendar.current_year
     current_month = my_calendar.current_month
     days_quantity = monthrange(current_year, current_month)[1]
@@ -40,8 +42,16 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
         if hasattr(user, 'profile') and (user.profile.is_bigboss or user.is_superuser):
             department_object = DepartmentEvent.objects.order_by('datetime')
         else:
-            department_object = DepartmentEvent.objects.filter(department=user.profile.podrazdelenie).order_by('datetime')
+            if user.profile.is_boss:
+                department_object = DepartmentEvent.objects.filter(
+                    department__name__in=[user.profile.podrazdelenie.name, 'Руководство ХПЧ']
+                ).order_by('datetime')
+            else:
+                department_object = DepartmentEvent.objects.filter(
+                    department__name=user.profile.podrazdelenie.name
+                ).order_by('datetime')
         event_type_for_color = Event_type.objects
+        staff_is_boss = Profile.objects.filter(is_boss=True)
         for dep_event in department_object:
             if str(date.date()) == str(dep_event.datetime.date()):
                 id = f'department_event_id{dep_event.id}'
@@ -49,26 +59,47 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
                 ev_date = dep_event.datetime
                 ev_time = f'{str(ev_date).split(" ")[1].split(":")[0]}:{str(ev_date).split(" ")[1].split(":")[1]}'
                 ev_type = dep_event.type
-                btn_color = f'background-color: green; border-color: red'
+                btn_color = f'background-color: blue; border-color: red' if dep_event.department.name == "Руководство ХПЧ" else  f'background-color: green; border-color: red'
                 ev_location = dep_event.location
                 ev_utochneniya = f'<h5 style="color: red">Описание:<br></h5><p>{dep_event.description}</p>' if dep_event.description and dep_event.description.strip() else ''
-                ev_staff = '<br>'.join([
-                    f'<a href="tel:{p.phone}">{p.last_name} {p.first_name[0]}.</a>'
-                    for p in dep_event.staff.all()
-                    if p.last_name and p.first_name and p.phone
-                ])
+
+                ev_staff = '<br>'.join([f'<a href="tel:{p.phone}" style="color: #4b0082; text-decoration: underline; font-weight: bold;">{p.last_name} {p.first_name[0]}.</a>'
+                                        for p in dep_event.staff.all()
+                                        if p.last_name and p.first_name and p.phone])
+                if hasattr(user, 'profile') and (user.profile.is_boss or user.is_superuser) and dep_event.department.name != 'Руководство ХПЧ':
+                    menu_html = render_to_string('department_events/dep_menu.html', {'event': dep_event})
+                elif hasattr(user, 'profile') and (user.profile.is_bigboss or user.is_superuser) and dep_event.department.name == 'Руководство ХПЧ':
+                    menu_html = render_to_string('department_events/dep_menu.html', {'event': dep_event})
+                else:
+                    menu_html = ''
+
+                if hasattr(user, 'profile') and (user.profile.is_boss or user.is_superuser) and dep_event.department.name != 'Руководство ХПЧ':
+                    action_buttons = render_to_string('department_events/dep_actions.html', {'event': dep_event})
+                elif hasattr(user, 'profile') and (user.profile.is_bigboss or user.is_superuser) and dep_event.department.name == 'Руководство ХПЧ':
+                    action_buttons = render_to_string('department_events/dep_actions.html', {'event': dep_event})
+                else:
+                    action_buttons = ''
+
+                if hasattr(user, 'profile') and (
+                        user.profile.is_boss or user.is_superuser) and dep_event.department.name != 'Руководство ХПЧ':
+                    button_tg_html = f'<a href="?tgmessagedep={dep_event.id}" class="btn btn-info btn-sm">Отправить в телегу</a>'
+                elif hasattr(user, 'profile') and (
+                        user.profile.is_bigboss or user.is_superuser) and dep_event.department.name == 'Руководство ХПЧ':
+                    button_tg_html = f'<a href="?tgmessagedep={dep_event.id}" class="btn btn-info btn-sm">Отправить в телегу</a>'
+                else:
+                    button_tg_html = ''
 
                 department_li += render_to_string('main/event_item.html', {
-                    'user_valid': hasattr(user, 'profile') and user.profile.is_boss,
+                    'user_valid': hasattr(user, 'profile') and user.profile.is_boss or user.profile.is_bigboss,
                     'event': dep_event,
                     'date': date.strftime('%Y-%m-%d'),
                     'ev_time': ev_time,
                     'btn_color': btn_color,
-                    'menu_html': render_to_string('department_events/dep_menu.html', {'event': dep_event}) if hasattr(user, 'profile') and user.profile.is_boss else '',
+                    'menu_html': menu_html,
                     'ev_utochneniya': ev_utochneniya,
                     'ev_staff': ev_staff,
-                    'action_buttons': render_to_string('department_events/dep_actions.html', {'event': dep_event}) if hasattr(user, 'profile') and user.profile.is_boss else '',
-                    'button_tg_html': f'<a href="?tgmessagedep={dep_event.id}" class="btn btn-info btn-sm">Отправить в телегу</a>' if hasattr(user, 'profile') and user.profile.is_boss else '' ,
+                    'action_buttons': action_buttons,
+                    'button_tg_html': button_tg_html,
                     # 'button_tg_html': '',
                     'is_bigboss': hasattr(user, 'profile') and user.profile.is_bigboss,
                     'is_boss': hasattr(user, 'profile') and user.profile.is_boss,
@@ -104,9 +135,16 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
                     staff_lines.append('Грим')
                 if event.kostum == 'Да':
                     staff_lines.append('Костюм')
-                ev_staff = '<br>'.join(staff_lines)
+                ev_staff_lines = staff_lines
 
-                event_li += render_to_string('main/event_item.html', {
+                staff_by_group = {}
+                for label in ['Свет', 'Звук', 'Видео', 'Декорации', 'Реквизит', 'Грим', 'Костюм']:
+                    staff_by_group[label] = [
+                        p for p in event.staff.all()
+                        if p.podrazdelenie and p.podrazdelenie.name.lower() == label.lower()
+                    ]
+
+                context = {
                     'user_valid': user_valid,
                     'event': event,
                     'date': date.strftime('%Y-%m-%d'),
@@ -114,7 +152,7 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
                     'btn_color': btn_color,
                     'menu_html': render_to_string('main/event_menu.html', {'event': event}) if user_valid else '',
                     'ev_utochneniya': ev_utochneniya,
-                    'ev_staff': ev_staff,
+                    'ev_staff_lines': ev_staff_lines,
                     'action_buttons': render_to_string('main/event_actions.html', {'event': event}) if user_valid else '',
                     'button_tg_html': button_tg_html,
                     'is_boss': hasattr(user, 'profile') and user.profile.is_boss,
@@ -122,7 +160,13 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
                     'is_pomreg': hasattr(user, 'profile') and user.profile.is_pomreg,
                     'depart': False,
                     'is_super': user.is_superuser,
-                })
+                    'event_li': True,
+                    'staff_in_department': Profile.objects.filter(podrazdelenie=user.profile.podrazdelenie)
+                        if hasattr(user, 'profile') else [],
+                    'staff_by_group': staff_by_group,
+                }
+                context.update(csrf(request))
+                event_li += render_to_string('main/event_item.html', context)
 
         day_html = render_to_string('main/calendar_day.html', {
             'day_index': i + 1,
@@ -134,7 +178,7 @@ def calendar(result='', user_valid=False, card_header_bg_color='', user=None):
             'date': date.strftime('%Y-%m-%d'),
             'full_date': date.strftime('%Y-%m-%d'),
             'profile': user.profile,
-            'show_menu': user_valid or (hasattr(user, 'profile') and (user.profile.is_boss or user.is_superuser)),
+            'show_menu': user_valid or (hasattr(user, 'profile') and (user.profile.is_boss or user.is_superuser or user.profile.is_bigboss)),
             'user': user,
             'is_boss': hasattr(user, 'profile') and user.profile.is_boss,
             'is_bigboss': hasattr(user, 'profile') and user.profile.is_bigboss,

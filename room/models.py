@@ -7,17 +7,17 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
 
+def default_time_now():
+    return timezone.now().time()
+
 class MyEvents(models.Model):
     name = models.CharField(max_length=300, verbose_name='Название события', default='Событие')
-    date = models.DateField(verbose_name='Дата', default=timezone.now().date())
-    time = models.TimeField(verbose_name='Время', default=timezone.now().time())
+    date = models.DateField(verbose_name='Дата', default=timezone.now)
+    time = models.TimeField(verbose_name='Время', default=default_time_now)
     type = models.ForeignKey(to='Type', on_delete=models.CASCADE, verbose_name='Тип события', default='', null=True)
     desc = models.TextField(max_length=30000, verbose_name='Описание', null=True)
     file = models.FileField(verbose_name='Файлы', upload_to='user_files', null=True)
     user = models.ForeignKey(to=User, verbose_name='user', on_delete=models.CASCADE, null=True)
-
-
-
 
     def __str__(self):
         return self.name
@@ -38,12 +38,8 @@ def save_file(sender, instance, **kwargs):
     except:
         pass
 
-
-
-
 class Type(models.Model):
     name = models.CharField(max_length=300, verbose_name='Типы событий', default='Тип')
-
 
     def __str__(self):
         return self.name

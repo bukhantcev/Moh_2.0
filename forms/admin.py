@@ -13,6 +13,7 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ('date', 'name', 'type', 'location', 'svet', 'zvuk', 'video', 'decor', 'rekvizit', 'grim', 'kostum',)
     liink_display = ('date')
     list_editable = ('name', 'type', 'location', 'svet', 'zvuk', 'video', 'decor', 'rekvizit', 'grim', 'kostum',)
+    filter_horizontal = ('staff',)
 
 
 # Register your models here.

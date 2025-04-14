@@ -9,4 +9,6 @@ def chet(value):
     else:
         return False
 
-
+@register.filter
+def get_item(dictionary, key):
+    return dictionary.get(key)

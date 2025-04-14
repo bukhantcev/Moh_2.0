@@ -1,3 +1,4 @@
+from django.views.decorators.http import require_POST
 from django import forms
 import datetime
 import os
@@ -20,8 +21,8 @@ from .forms import SpectForm
 from accounts.models import Profile, Podrazdelenie, Dolgnost
 from dotenv import load_dotenv
 load_dotenv()
-print("BOT_TOKEN:", os.getenv("BOT_TOKEN"))
-print("BOT_TOKEN_LIGHT:", os.getenv("BOT_TOKEN_LIGHT"))
+
+
 
 
 
@@ -145,8 +146,13 @@ def index(request):       #-------------MAIN
                 card_bg_color = ''#------TODAY
 
         context = {
-            'cal': calendar(result='', user_valid=request.user.profile.is_pomreg, card_header_bg_color=card_bg_color,
-                            user=request.user),
+        'cal': calendar(
+            request=request,
+            result='',
+            user_valid=request.user.profile.is_pomreg,
+            card_header_bg_color=card_bg_color,
+            user=request.user
+        ),
             'current_month': my_calendar.month_text[my_calendar.current_month],
             'btn_month': calendar_switch_month(),
             'current_year': calendar_switch_year()['current_year'],
@@ -387,6 +393,18 @@ def workers(request):
                     }
                 elif request.GET.get('podr') == 'grim':
                     users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Грим').id).order_by(
+                        'sort_index')
+                    context = {
+                        "users": users
+                    }
+                elif request.GET.get('podr') == 'zavpost':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Руководство ХПЧ').id).order_by(
+                        'sort_index')
+                    context = {
+                        "users": users
+                    }
+                elif request.GET.get('podr') == 'lit':
+                    users = Profile.objects.filter(podrazdelenie=Podrazdelenie.objects.get(name='Литературная часть').id).order_by(
                         'sort_index')
                     context = {
                         "users": users
@@ -643,3 +661,50 @@ def update_event_date(request, event_id):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'error': 'Invalid method'}, status=405)
+
+@require_POST
+def assign_event_staff(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    if not hasattr(request.user, 'profile') or not request.user.profile.is_boss:
+        return redirect('/')
+
+    user_department = request.user.profile.podrazdelenie
+    staff_ids = request.POST.getlist('staff_ids')
+
+    # текущие сотрудники
+    current_staff = event.staff.all()
+    # чужие — которых нельзя трогать
+    foreign_staff = current_staff.exclude(podrazdelenie=user_department)
+    # свои выбранные
+    selected_own_profiles = Profile.objects.filter(id__in=staff_ids, podrazdelenie=user_department)
+
+    # итог: чужие + новые свои
+    event.staff.set(foreign_staff.union(selected_own_profiles))
+    event.save()
+
+    from department_events.models import DepartmentEvent, DepartmentEventType, DepartmentEventName, DepartmentEventLocation
+    # Проверка и автосоздание DepartmentEvent
+    if selected_own_profiles.exists():
+        dep = user_department
+        if not DepartmentEvent.objects.filter(
+                datetime=event.date,
+                type__name=event.type.type,
+                name__name=event.name.name,
+                location__name=event.location.location,
+                department=dep
+        ).exists():
+            type_obj, _ = DepartmentEventType.objects.get_or_create(name=event.type.type, department=dep)
+            name_obj, _ = DepartmentEventName.objects.get_or_create(name=event.name.name, department=dep)
+            location_obj, _ = DepartmentEventLocation.objects.get_or_create(name=event.location.location,
+                                                                            department=dep)
+
+            dep_event = DepartmentEvent.objects.create(
+                datetime=event.date,
+                type=type_obj,
+                name=name_obj,
+                location=location_obj,
+                department=dep
+            )
+            dep_event.staff.set(selected_own_profiles)
+    scroll_to = event.date.strftime('%Y-%m-%d')
+    return redirect(f"/?scroll_to={scroll_to}")

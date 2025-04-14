@@ -32,8 +32,8 @@ class Profile(models.Model):
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
         new = Profile.objects.get(user=instance)
-        new.first_name = sender.objects.get(username=instance).first_name
-        new.last_name = sender.objects.get(username=instance).last_name
+        new.first_name = instance.first_name
+        new.last_name = instance.last_name
         new.save()
 
 

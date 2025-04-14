@@ -23,61 +23,67 @@ class EventNameForm(forms.ModelForm):
 
 @login_required
 def create_department_event(request):
-    if not request.user.profile.is_boss:
+    if request.user.profile.is_boss or request.user.profile.is_bigboss:
+
+
+        if request.method == 'POST':
+            date = request.POST.get('date')
+            type_id = request.POST.get('type')
+            name_id = request.POST.get('name')
+            location_id = request.POST.get('location')
+            description = request.POST.get('description', '')
+            selected_ids = request.POST.getlist('employees')
+
+            event = DepartmentEvent.objects.create(
+                datetime=date,
+                department=request.user.profile.podrazdelenie,
+                type_id=type_id,
+                name_id=name_id,
+                location_id=location_id,
+                description=description
+            )
+            event.staff.set(Profile.objects.filter(id__in=selected_ids))
+
+            scroll_to = date[:10]
+            return redirect(f"/?scroll_to={scroll_to}")
+
+        copy_id = request.GET.get('copy_id')
+        if request.user.profile.is_bigboss:
+            users = Profile.objects.filter(is_boss=True)
+        else:
+            users = Profile.objects.filter(podrazdelenie=request.user.profile.podrazdelenie)
+        if copy_id:
+            try:
+                original = DepartmentEvent.objects.get(id=copy_id)
+                context = {
+                    'date': original.datetime.strftime('%Y-%m-%dT%H:%M'),
+                    'types': DepartmentEventType.objects.filter(department=request.user.profile.podrazdelenie),
+                    'names': DepartmentEventName.objects.filter(department=request.user.profile.podrazdelenie),
+                    'locations': DepartmentEventLocation.objects.filter(department=request.user.profile.podrazdelenie),
+                    'users': users,
+                    'selected_type': original.type.id,
+                    'selected_name': original.name.id,
+                    'selected_location': original.location.id,
+                    'description': original.description,
+                    'selected_employees': original.staff.values_list('id', flat=True),
+                }
+                return render(request, 'department_events/create_event.html', context)
+            except DepartmentEvent.DoesNotExist:
+                pass
+
+        date = request.GET.get('date')
+        if date:
+            date += 'T19:00'
+
+        context = {
+            'date': date,
+            'types': DepartmentEventType.objects.filter(department=request.user.profile.podrazdelenie),
+            'names': DepartmentEventName.objects.filter(department=request.user.profile.podrazdelenie),
+            'locations': DepartmentEventLocation.objects.filter(department=request.user.profile.podrazdelenie),
+            'users': users,
+        }
+    else:
         return redirect('/')
-
-    if request.method == 'POST':
-        date = request.POST.get('date')
-        type_id = request.POST.get('type')
-        name_id = request.POST.get('name')
-        location_id = request.POST.get('location')
-        description = request.POST.get('description', '')
-        selected_ids = request.POST.getlist('employees')
-
-        event = DepartmentEvent.objects.create(
-            datetime=date,
-            department=request.user.profile.podrazdelenie,
-            type_id=type_id,
-            name_id=name_id,
-            location_id=location_id,
-            description=description
-        )
-        event.staff.set(Profile.objects.filter(id__in=selected_ids))
-
-        scroll_to = date[:10]
-        return redirect(f"/?scroll_to={scroll_to}")
-
-    copy_id = request.GET.get('copy_id')
-    if copy_id:
-        try:
-            original = DepartmentEvent.objects.get(id=copy_id)
-            context = {
-                'date': original.datetime.strftime('%Y-%m-%dT%H:%M'),
-                'types': DepartmentEventType.objects.filter(department=request.user.profile.podrazdelenie),
-                'names': DepartmentEventName.objects.filter(department=request.user.profile.podrazdelenie),
-                'locations': DepartmentEventLocation.objects.filter(department=request.user.profile.podrazdelenie),
-                'users': Profile.objects.filter(podrazdelenie=request.user.profile.podrazdelenie),
-                'selected_type': original.type.id,
-                'selected_name': original.name.id,
-                'selected_location': original.location.id,
-                'description': original.description,
-                'selected_employees': original.staff.values_list('id', flat=True),
-            }
-            return render(request, 'department_events/create_event.html', context)
-        except DepartmentEvent.DoesNotExist:
-            pass
-
-    date = request.GET.get('date')
-    if date:
-        date += 'T19:00'
-
-    context = {
-        'date': date,
-        'types': DepartmentEventType.objects.filter(department=request.user.profile.podrazdelenie),
-        'names': DepartmentEventName.objects.filter(department=request.user.profile.podrazdelenie),
-        'locations': DepartmentEventLocation.objects.filter(department=request.user.profile.podrazdelenie),
-        'users': Profile.objects.filter(podrazdelenie=request.user.profile.podrazdelenie),
-    }
     return render(request, 'department_events/create_event.html', context)
 
 def edit_dep_event(request, event_id):
@@ -93,6 +99,10 @@ def edit_dep_event(request, event_id):
         event.staff.set(Profile.objects.filter(id__in=selected_ids))
         scroll_to = event.datetime.strftime('%Y-%m-%d')
         return redirect(f"/?scroll_to={scroll_to}")
+    if request.user.profile.is_bigboss:
+        users = Profile.objects.filter(is_boss=True)
+    else:
+        users = Profile.objects.filter(podrazdelenie=event.department)
 
     context = {
         'event': event,
@@ -100,7 +110,7 @@ def edit_dep_event(request, event_id):
         'types': DepartmentEventType.objects.filter(department=event.department),
         'names': DepartmentEventName.objects.filter(department=event.department),
         'locations': DepartmentEventLocation.objects.filter(department=event.department),
-        'users': Profile.objects.filter(podrazdelenie=event.department),
+        'users': users,
         'selected_employees': event.staff.values_list('id', flat=True)
     }
     return render(request, 'department_events/edit_dep_event.html', context)

@@ -10,7 +10,9 @@ urlpatterns = [
     path('ajax/', include('ajax.urls')),
     path('users/', include('accounts.urls')),
     path('room/', include('room.urls')),
-        path('department-events/', include('department_events.urls')),
+    path('department-events/', include('department_events.urls')),
+] + [
+    path('i18n/', include('django.conf.urls.i18n')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # http: // 127.0.0.1: 8000 / accounts / login / длявхода,

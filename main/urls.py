@@ -20,6 +20,7 @@ urlpatterns = [
     path('event-type/', views.manage_event_types, name='manage_event_types'),
     path('event-type/edit/<int:pk>/', views.edit_event_type, name='edit_event_type'),
     path('event-type/delete/<int:pk>/', views.delete_event_type, name='delete_event_type'),
+    path('event/<int:event_id>/assign_staff/', views.assign_event_staff, name='assign_event_staff'),
 
     path('event-name/', views.manage_event_names, name='manage_event_names'),
     path('event-name/edit/<int:pk>/', views.edit_event_name, name='edit_event_name'),
