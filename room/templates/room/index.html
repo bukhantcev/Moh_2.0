@@ -63,8 +63,8 @@
                         </div>
                     </div>
                 </div>
-                {% if request.user.username == 'bukhantcev' %}
-                    <div id="easterCat" style="position:absolute; top:200px; left:200px; cursor:pointer; z-index:9999; font-size: 5rem; animation: bounce 1s infinite; pointer-events: auto; background: transparent;">
+                {% if request.user.username == 'marinochka' %}
+                    <div id="easterCat" style="display:none; position:absolute; top:200px; left:200px; cursor:pointer; z-index:9999; font-size: 5rem; animation: bounce 1s infinite; pointer-events: auto; background: transparent;">
                         🐱
                     </div>
                     <style>
@@ -122,7 +122,7 @@
             }
         });
 
-        {% if request.user.username == 'bukhantcev' %}
+        {% if request.user.username == 'marinochka' %}
         const phoneInput = form.querySelector('input[name="phone"]');
         const originalPhone = phoneInput.value;
 
@@ -211,8 +211,6 @@
         let hoverState = false;
 
         if (logoArea && cat) {
-            cat.style.display = 'none';
-
             logoArea.addEventListener("mouseover", () => {
                 if (!hoverState) {
                     hoverState = true;
